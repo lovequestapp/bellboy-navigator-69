@@ -1,13 +1,21 @@
 
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { X } from "lucide-react";
 import { usePreferences } from "@/contexts/PreferencesContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import ColorPicker from "@/components/ui/ColorPicker";
 
 interface PreferencesModalProps {
@@ -15,248 +23,302 @@ interface PreferencesModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-interface PreferencesFormValues {
-  notifications: boolean;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  marketingEmails: boolean;
-  language: string;
-  currency: string;
-  theme: string;
-}
+type PreferenceTab = "theme" | "notifications" | "language" | "currency";
 
-const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpenChange }) => {
+const PreferencesModal: React.FC<PreferencesModalProps> = ({
+  open,
+  onOpenChange,
+}) => {
   const { preferences, updatePreferences } = usePreferences();
-  
-  const form = useForm<PreferencesFormValues>({
-    defaultValues: {
-      notifications: preferences.notifications,
-      emailNotifications: true,
-      pushNotifications: true,
-      marketingEmails: false,
-      language: "english",
-      currency: "usd",
-      theme: preferences.darkMode ? "dark" : "light",
-    },
-  });
-  
-  const handleNotificationsChange = (checked: boolean) => {
-    form.setValue("notifications", checked);
-    updatePreferences({ notifications: checked });
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<PreferenceTab>("theme");
+
+  const handleSave = () => {
+    updatePreferences(preferences);
+    toast({
+      title: "Preferences Saved",
+      description: "Your preferences have been updated successfully.",
+    });
+    onOpenChange(false);
   };
-  
-  const handleThemeChange = (value: string) => {
-    form.setValue("theme", value);
-    updatePreferences({ darkMode: value === "dark" });
-  };
-  
-  const handleAccentColorChange = (color: string) => {
-    updatePreferences({ accentColor: color });
+
+  const handleColorChange = (color: string) => {
+    document.documentElement.style.setProperty("--bellboy-color", color);
+    updatePreferences({ ...preferences, accentColor: color });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="font-serif">Preferences</DialogTitle>
-          <DialogDescription>
-            Customize your app experience and notification settings.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[550px]">
+        <DialogHeader className="flex flex-row items-center justify-between">
+          <DialogTitle className="text-xl font-serif">Preferences</DialogTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-full"
+            onClick={() => onOpenChange(false)}
+          >
+            <X size={18} />
+          </Button>
         </DialogHeader>
-        
-        <div className="space-y-6 mt-2">
-          <Form {...form}>
+
+        <Tabs
+          defaultValue="theme"
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as PreferenceTab)}
+          className="mt-2"
+        >
+          <TabsList className="grid grid-cols-4">
+            <TabsTrigger value="theme">Theme</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="language">Language</TabsTrigger>
+            <TabsTrigger value="currency">Currency</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="theme" className="space-y-6 mt-6">
             <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium mb-2">Notifications</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>All Notifications</FormLabel>
-                    <Switch
-                      checked={form.watch("notifications")}
-                      onCheckedChange={handleNotificationsChange}
-                    />
-                  </div>
-                  
-                  <div className="ml-4 space-y-3">
-                    <FormField
-                      control={form.control}
-                      name="emailNotifications"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between space-y-0 py-1">
-                          <FormLabel>Email Notifications</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={!form.watch("notifications")}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="pushNotifications"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between space-y-0 py-1">
-                          <FormLabel>Push Notifications</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={!form.watch("notifications")}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="marketingEmails"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between space-y-0 py-1">
-                          <FormLabel>Marketing Emails</FormLabel>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={!form.watch("notifications")}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="dark-mode" className="font-medium">
+                  Dark Mode
+                </Label>
+                <Switch
+                  id="dark-mode"
+                  checked={preferences.darkMode}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({ ...preferences, darkMode: checked })
+                  }
+                />
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-2">Regional Settings</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="language"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Language</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="english">English</SelectItem>
-                            <SelectItem value="spanish">Spanish</SelectItem>
-                            <SelectItem value="french">French</SelectItem>
-                            <SelectItem value="german">German</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="currency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Currency</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select currency" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="usd">USD ($)</SelectItem>
-                            <SelectItem value="eur">EUR (€)</SelectItem>
-                            <SelectItem value="gbp">GBP (£)</SelectItem>
-                            <SelectItem value="jpy">JPY (¥)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+
+              <div className="space-y-3">
+                <Label className="font-medium">Accent Color</Label>
+                <ColorPicker
+                  currentColor={preferences.accentColor || "#0F1E54"}
+                  onColorChange={handleColorChange}
+                />
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-2">Appearance</h3>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="theme"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Theme</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => handleThemeChange(value)}
-                            defaultValue={field.value}
-                            className="flex gap-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="light" id="light" />
-                              <FormLabel htmlFor="light">Light</FormLabel>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="dark" id="dark" />
-                              <FormLabel htmlFor="dark">Dark</FormLabel>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div>
-                    <FormLabel>Accent Color</FormLabel>
-                    <ColorPicker
-                      selectedColor={preferences.accentColor}
-                      onChange={handleAccentColorChange}
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="reduce-animations" className="font-medium">
+                  Reduce Animations
+                </Label>
+                <Switch
+                  id="reduce-animations"
+                  checked={preferences.reduceAnimations}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      reduceAnimations: checked,
+                    })
+                  }
+                />
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-2">Privacy</h3>
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name="analytics"
-                    render={({ field }) => (
-                      <FormItem className="flex space-x-3 space-y-0 py-1">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Share analytics data</FormLabel>
-                          <FormDescription>
-                            Help us improve by sharing anonymous usage data
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="high-contrast" className="font-medium">
+                  High Contrast
+                </Label>
+                <Switch
+                  id="high-contrast"
+                  checked={preferences.highContrast}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      highContrast: checked,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6 mt-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-notifications" className="font-medium">
+                  Email Notifications
+                </Label>
+                <Switch
+                  id="email-notifications"
+                  checked={preferences.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      emailNotifications: checked,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push-notifications" className="font-medium">
+                  Push Notifications
+                </Label>
+                <Switch
+                  id="push-notifications"
+                  checked={preferences.pushNotifications}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      pushNotifications: checked,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="marketing-emails" className="font-medium">
+                    Marketing Emails
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive updates about new features and promotions
+                  </p>
+                </div>
+                <Switch
+                  id="marketing-emails"
+                  checked={preferences.marketingEmails}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      marketingEmails: checked,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="data-collection"
+                  checked={preferences.dataCollection}
+                  onCheckedChange={(checked) =>
+                    updatePreferences({
+                      ...preferences,
+                      dataCollection: checked === true,
+                    })
+                  }
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label
+                    htmlFor="data-collection"
+                    className="font-medium cursor-pointer"
+                  >
+                    Data Collection
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Allow us to collect usage data to improve your experience
+                  </p>
                 </div>
               </div>
             </div>
-          </Form>
+          </TabsContent>
+
+          <TabsContent value="language" className="space-y-6 mt-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="language" className="font-medium">
+                  Display Language
+                </Label>
+                <Select
+                  value={preferences.language}
+                  onValueChange={(value) =>
+                    updatePreferences({ ...preferences, language: value })
+                  }
+                >
+                  <SelectTrigger id="language">
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en-US">English (US)</SelectItem>
+                    <SelectItem value="en-GB">English (UK)</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                    <SelectItem value="de">German</SelectItem>
+                    <SelectItem value="ja">Japanese</SelectItem>
+                    <SelectItem value="zh">Chinese</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date-format" className="font-medium">
+                  Date Format
+                </Label>
+                <Select
+                  value={preferences.dateFormat}
+                  onValueChange={(value) =>
+                    updatePreferences({ ...preferences, dateFormat: value })
+                  }
+                >
+                  <SelectTrigger id="date-format">
+                    <SelectValue placeholder="Select date format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                    <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                    <SelectItem value="YYYY/MM/DD">YYYY/MM/DD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="time-format" className="font-medium">
+                  Time Format
+                </Label>
+                <Select
+                  value={preferences.timeFormat}
+                  onValueChange={(value) =>
+                    updatePreferences({ ...preferences, timeFormat: value })
+                  }
+                >
+                  <SelectTrigger id="time-format">
+                    <SelectValue placeholder="Select time format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="12h">12-hour (AM/PM)</SelectItem>
+                    <SelectItem value="24h">24-hour</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="currency" className="space-y-6 mt-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currency" className="font-medium">
+                  Display Currency
+                </Label>
+                <Select
+                  value={preferences.currency}
+                  onValueChange={(value) =>
+                    updatePreferences({ ...preferences, currency: value })
+                  }
+                >
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD ($)</SelectItem>
+                    <SelectItem value="EUR">EUR (€)</SelectItem>
+                    <SelectItem value="GBP">GBP (£)</SelectItem>
+                    <SelectItem value="JPY">JPY (¥)</SelectItem>
+                    <SelectItem value="CAD">CAD ($)</SelectItem>
+                    <SelectItem value="AUD">AUD ($)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end mt-6">
+          <Button variant="outline" className="mr-2" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} className="bg-bellboy text-white hover:bg-bellboy-light">
+            Save Changes
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import {
   ArrowRight,
   Check,
   Smartphone,
-  Clock // Added the missing Clock icon import
+  Clock
 } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import { 
@@ -234,7 +233,7 @@ const Landing = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-white text-white hover:bg-white/10 shadow-md"
+              className="border-white text-white hover:bg-white/10 shadow-md font-medium"
               onClick={() => navigate("/hotels")}
             >
               Explore Features
