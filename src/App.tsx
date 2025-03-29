@@ -26,6 +26,7 @@ import UserProfiles from "./pages/admin/UserProfiles";
 import ActivityTracking from "./pages/admin/ActivityTracking";
 import SupportTickets from "./pages/admin/SupportTickets";
 import HotelListings from "./pages/admin/HotelListings";
+import IntegrationsManager from "./pages/admin/IntegrationsManager";
 
 // Set default accent color for luxury aesthetics
 document.documentElement.style.setProperty("--bellboy-color", "#0F3460");
@@ -95,6 +96,7 @@ const App = () => {
                   <Route path="/admin/activity" element={<ActivityTracking />} />
                   <Route path="/admin/tickets" element={<SupportTickets />} />
                   <Route path="/admin/hotels" element={<HotelListings />} />
+                  <Route path="/admin/integrations" element={<IntegrationsManager />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>

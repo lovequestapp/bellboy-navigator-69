@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Users, Settings, Hotel, Tag, MapPin, BarChart, 
-  Link, Palette, Mail, ToggleRight, MessageSquare, Activity
+  Link, Palette, Mail, ToggleRight, MessageSquare, Activity, Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,6 +40,7 @@ const sidebarItems = [
   {
     group: "Integrations",
     items: [
+      { name: "Integrations Manager", path: "/admin/integrations", icon: <Layers className="mr-2 h-4 w-4" /> },
       { name: "API Status", path: "/admin/api-status", icon: <Link className="mr-2 h-4 w-4" /> },
       { name: "Configuration", path: "/admin/configuration", icon: <Settings className="mr-2 h-4 w-4" /> }
     ]
