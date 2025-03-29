@@ -31,6 +31,8 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
         return "Check Out";
       case "/concierge":
         return "Virtual Concierge";
+      case "/landing":
+        return "Welcome";
       default:
         return "BellBoy";
     }
@@ -50,7 +52,10 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
           )}
           <h1 className="text-lg font-serif font-semibold tracking-tight">{getPageTitle()}</h1>
         </div>
-        <button className="text-foreground hover:text-bellboy transition-colors relative">
+        <button 
+          className="text-foreground hover:text-bellboy transition-colors relative bg-transparent p-1.5 rounded-full hover:bg-muted/50"
+          aria-label="Notifications"
+        >
           <Bell size={20} />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-bellboy-gold rounded-full"></span>
         </button>
