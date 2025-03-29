@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Hotel } from "@/services/hotelService";
 import { 
@@ -70,7 +69,7 @@ const HotelDetailView: React.FC<HotelDetailViewProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto py-4">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif">{hotel.name}</DialogTitle>
           <DialogDescription className="flex items-center text-foreground">
@@ -80,7 +79,7 @@ const HotelDetailView: React.FC<HotelDetailViewProps> = ({
         </DialogHeader>
         
         <div className="mt-2">
-          <div className="w-full h-48 overflow-hidden rounded-md mb-4">
+          <div className="w-full h-40 sm:h-48 overflow-hidden rounded-md mb-4">
             <img 
               src={hotel.image} 
               alt={hotel.name} 
@@ -159,9 +158,9 @@ const HotelDetailView: React.FC<HotelDetailViewProps> = ({
           </div>
         </div>
         
-        <Separator className="my-4" />
+        <Separator className="my-3" />
         
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-0">
           {hotel.status === "upcoming" && (
             <>
               <Button variant="outline" onClick={handleModify}>

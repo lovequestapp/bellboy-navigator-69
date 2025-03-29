@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -141,7 +140,7 @@ const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({ open, onOpenC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[85vh] overflow-y-auto py-4">
         <DialogHeader>
           <DialogTitle className="font-serif">Payment Methods</DialogTitle>
           <DialogDescription>
