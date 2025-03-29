@@ -210,7 +210,7 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer showBottomNav={false} className="px-0 pb-0">
+    <PageContainer showBottomNav={true} className="px-0 pb-0">
       {/* Hero Section */}
       <section className="pt-20 pb-32 px-4 md:px-8 bg-gradient-to-br from-bellboy-dark via-bellboy to-bellboy-light text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1578683010236-d716f9a3f461')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
