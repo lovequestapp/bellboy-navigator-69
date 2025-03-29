@@ -233,7 +233,7 @@ const Landing = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-white text-white hover:bg-white/20 hover:border-white hover:text-white shadow-md font-medium"
+              className="border-white text-black hover:bg-white/20 hover:border-white hover:text-white shadow-md font-medium"
               onClick={() => navigate("/hotels")}
             >
               Explore Features
