@@ -1,6 +1,5 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -15,29 +14,34 @@ import Profile from "./pages/Profile";
 import CheckIn from "./pages/CheckIn";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
+import { AuthProvider } from "./contexts/AuthContext";
+import { PreferencesProvider } from "./contexts/PreferencesContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
-      <TooltipProvider>
-        {/* Only include one toast provider to avoid conflicts */}
-        <Toaster />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/hotels" element={<Hotels />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/:serviceId" element={<ServiceDetails />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/explore/:placeId" element={<PlaceDetails />} />
-          <Route path="/rewards" element={<Rewards />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/check-in" element={<CheckIn />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
+      <AuthProvider>
+        <PreferencesProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/hotels" element={<Hotels />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/services/:serviceId" element={<ServiceDetails />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/explore/:placeId" element={<PlaceDetails />} />
+              <Route path="/rewards" element={<Rewards />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TooltipProvider>
+        </PreferencesProvider>
+      </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>
 );
