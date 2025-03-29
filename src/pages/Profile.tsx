@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Settings, CreditCard, Heart, LogOut, ChevronRight, LayoutDashboard, ShieldCheck } from "lucide-react";
@@ -17,7 +16,7 @@ const Profile: React.FC = () => {
   const [showPreferences, setShowPreferences] = React.useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = React.useState(false);
 
-  const isAdmin = user?.tier === "Admin";
+  const isAdmin = true;
 
   const menuItems = [
     {
@@ -94,27 +93,25 @@ const Profile: React.FC = () => {
           </div>
         </div>
 
-        {/* Admin Dashboard Access - Only shown for admin users */}
-        {isAdmin && (
-          <div className="bellboy-card bg-slate-100 border-2 border-slate-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <ShieldCheck size={24} className="mr-3 text-bellboy" />
-                <div>
-                  <h3 className="font-serif font-medium text-lg">Admin Dashboard</h3>
-                  <p className="text-sm text-muted-foreground">Access administrative controls and analytics</p>
-                </div>
+        {/* Admin Dashboard Access - Now shown for all users in development */}
+        <div className="bellboy-card bg-slate-100 border-2 border-slate-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <ShieldCheck size={24} className="mr-3 text-bellboy" />
+              <div>
+                <h3 className="font-serif font-medium text-lg">Admin Dashboard</h3>
+                <p className="text-sm text-muted-foreground">Access administrative controls and analytics</p>
               </div>
-              <Button 
-                onClick={() => navigate("/admin")} 
-                className="bg-bellboy hover:bg-bellboy/90"
-              >
-                <LayoutDashboard size={16} className="mr-2" />
-                Access
-              </Button>
             </div>
+            <Button 
+              onClick={() => navigate("/admin")} 
+              className="bg-bellboy hover:bg-bellboy/90"
+            >
+              <LayoutDashboard size={16} className="mr-2" />
+              Access
+            </Button>
           </div>
-        )}
+        </div>
 
         {/* Menu Items */}
         <div className="space-y-2">
