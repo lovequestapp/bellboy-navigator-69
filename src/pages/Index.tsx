@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleFeatureClick = (route: string) => {
+    navigate(route);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-bellboy text-white py-8 px-6">
@@ -41,22 +45,34 @@ const Index = () => {
         <section className="mb-10 animate-fade-in" style={{ animationDelay: "0.2s" }}>
           <h2 className="text-xl font-serif font-semibold mb-4">Key Features</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bellboy-card flex flex-col items-center justify-center p-4 text-center">
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              onClick={() => handleFeatureClick("/hotels")}
+            >
               <Bed size={32} className="text-bellboy mb-2" />
               <h3 className="font-medium">Hotel Management</h3>
               <p className="text-xs text-muted-foreground mt-1">Easy check-in and room access</p>
             </div>
-            <div className="bellboy-card flex flex-col items-center justify-center p-4 text-center">
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              onClick={() => handleFeatureClick("/services")}
+            >
               <Bell size={32} className="text-bellboy mb-2" />
               <h3 className="font-medium">Concierge Services</h3>
               <p className="text-xs text-muted-foreground mt-1">Pre-order meals and services</p>
             </div>
-            <div className="bellboy-card flex flex-col items-center justify-center p-4 text-center">
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              onClick={() => handleFeatureClick("/explore")}
+            >
               <MapPin size={32} className="text-bellboy mb-2" />
               <h3 className="font-medium">City Exploration</h3>
               <p className="text-xs text-muted-foreground mt-1">Discover local attractions</p>
             </div>
-            <div className="bellboy-card flex flex-col items-center justify-center p-4 text-center">
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              onClick={() => handleFeatureClick("/rewards")}
+            >
               <Heart size={32} className="text-bellboy mb-2" />
               <h3 className="font-medium">Loyalty Rewards</h3>
               <p className="text-xs text-muted-foreground mt-1">Earn points with every stay</p>
@@ -70,7 +86,7 @@ const Index = () => {
             <p className="text-white/80 text-sm mb-4">Register your upcoming hotel stay now.</p>
             <button 
               className="bg-white text-bellboy font-medium px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors w-full flex items-center justify-center"
-              onClick={() => navigate("/hotels")}
+              onClick={() => navigate("/check-in")}
             >
               <Calendar size={18} className="mr-2" />
               <span>Add New Stay</span>
