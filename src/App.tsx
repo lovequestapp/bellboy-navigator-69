@@ -18,6 +18,9 @@ import VirtualConcierge from "./pages/VirtualConcierge";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
+// Set default accent color for luxury aesthetics
+document.documentElement.style.setProperty("--bellboy-color", "#0F3460");
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,21 +29,23 @@ const App = () => (
       <AuthProvider>
         <PreferencesProvider>
           <TooltipProvider>
-            <Toaster />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/hotels" element={<Hotels />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/services/:serviceId" element={<ServiceDetails />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/explore/:placeId" element={<PlaceDetails />} />
-              <Route path="/rewards" element={<Rewards />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/check-in" element={<CheckIn />} />
-              <Route path="/concierge" element={<VirtualConcierge />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div className="bg-gradient-to-tr from-background to-background/95 min-h-screen">
+              <Toaster />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/landing" element={<Landing />} />
+                <Route path="/hotels" element={<Hotels />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/services/:serviceId" element={<ServiceDetails />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/explore/:placeId" element={<PlaceDetails />} />
+                <Route path="/rewards" element={<Rewards />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/check-in" element={<CheckIn />} />
+                <Route path="/concierge" element={<VirtualConcierge />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
           </TooltipProvider>
         </PreferencesProvider>
       </AuthProvider>

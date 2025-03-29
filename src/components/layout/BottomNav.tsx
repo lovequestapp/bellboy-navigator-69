@@ -37,20 +37,22 @@ const BottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-md bg-opacity-90 border-t border-border px-2 py-3 flex justify-around items-center z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-border/30 px-2 py-3 flex justify-around items-center z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]">
       {navItems.map((item) => (
         <button
           key={item.name}
           onClick={() => navigate(item.path)}
           className={cn(
-            "flex flex-col items-center justify-center p-1 rounded-md w-16 transition-colors",
+            "flex flex-col items-center justify-center p-1 rounded-md w-16 transition-all duration-300",
             location.pathname === item.path
-              ? "text-bellboy"
+              ? "text-bellboy scale-105"
               : "text-muted-foreground hover:text-bellboy-light"
           )}
         >
-          <item.icon size={20} />
-          <span className="text-xs mt-1">{item.name}</span>
+          <item.icon size={20} className={cn("transition-all duration-300", 
+            location.pathname === item.path ? "stroke-[2.25px]" : "")} />
+          <span className={cn("text-xs mt-1 font-medium transition-all", 
+            location.pathname === item.path ? "opacity-100" : "opacity-80")}>{item.name}</span>
         </button>
       ))}
     </div>

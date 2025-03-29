@@ -37,7 +37,7 @@
 
     --radius: 0.5rem;
 
-    --bellboy-color: #1A365D;
+    --bellboy-color: #0F3460;
   }
 
   .dark {
@@ -89,15 +89,15 @@
 
 @layer components {
   .bellboy-card {
-    @apply bg-white/80 backdrop-blur-sm rounded-lg shadow-md p-6 border border-border/40 hover:shadow-lg transition-all duration-300;
+    @apply bg-white/90 backdrop-blur-md rounded-lg shadow-luxury-sm p-6 border border-white/40 hover:shadow-luxury transition-all duration-300;
   }
   
   .bellboy-button-primary {
-    @apply bg-bellboy text-white font-medium px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors shadow-sm;
+    @apply bg-bellboy text-white font-medium px-5 py-2.5 rounded-md hover:bg-opacity-90 transition-all duration-300 shadow-sm hover:shadow-md;
   }
   
   .bellboy-button-secondary {
-    @apply bg-bellboy-accent/80 text-bellboy font-medium px-4 py-2 rounded-md hover:bg-opacity-95 transition-colors shadow-sm;
+    @apply bg-bellboy-accent/80 text-bellboy font-medium px-5 py-2.5 rounded-md hover:bg-opacity-95 transition-all duration-300 shadow-sm hover:shadow-md;
   }
   
   .bellboy-input {
@@ -105,11 +105,11 @@
   }
 
   .luxury-gradient {
-    @apply bg-gradient-to-br from-bellboy to-bellboy-dark;
+    @apply bg-gradient-to-r from-bellboy via-bellboy-navy to-bellboy-dark;
   }
 
   .luxury-card {
-    @apply bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300;
+    @apply bg-white/95 backdrop-blur-md rounded-xl shadow-luxury border border-white/30 p-6 hover:shadow-premium transition-all duration-300;
   }
 
   .premium-text {
@@ -146,20 +146,32 @@
 
 /* Premium UI elements */
 .premium-shadow {
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.1);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  @apply rounded-lg p-5 transition-all duration-300;
 }
 
 .dark .glass-card {
-  background: rgba(30, 30, 30, 0.7);
+  background: rgba(30, 30, 30, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Shimmer effect */
+.shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 50%, 
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
 /* Subtle animations */
@@ -168,18 +180,11 @@
 }
 
 .hover-lift:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Typographic improvements */
-.premium-layout {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-/* Advanced buttons */
+/* Advanced Buttons */
 .btn-premium {
   @apply px-6 py-3 font-medium rounded-md shadow-sm transition-all duration-300;
   letter-spacing: 0.01em;
@@ -200,4 +205,30 @@
 
 .btn-premium:hover::after {
   width: 100%;
+}
+
+/* High-end card designs */
+.luxury-panel {
+  @apply bg-white/95 backdrop-blur-lg rounded-lg border border-white/50 shadow-luxury p-6;
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #D4AF37, transparent);
+}
+
+/* Gold accent elements */
+.gold-accent {
+  background: linear-gradient(45deg, #D4AF37, #E8D8A3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }

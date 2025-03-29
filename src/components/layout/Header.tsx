@@ -29,14 +29,16 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
         return "Check In";
       case "/check-out":
         return "Check Out";
+      case "/concierge":
+        return "Virtual Concierge";
       default:
         return "BellBoy";
     }
   };
 
   return (
-    <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border z-10">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-border/30 shadow-sm z-10">
+      <div className="container mx-auto px-4 py-5 flex items-center justify-between">
         <div className="flex items-center">
           {showBackButton && (
             <button 
@@ -46,10 +48,11 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
               <ArrowLeft size={20} />
             </button>
           )}
-          <h1 className="text-lg font-serif font-semibold">{getPageTitle()}</h1>
+          <h1 className="text-lg font-serif font-semibold tracking-tight">{getPageTitle()}</h1>
         </div>
-        <button className="text-foreground hover:text-bellboy transition-colors">
+        <button className="text-foreground hover:text-bellboy transition-colors relative">
           <Bell size={20} />
+          <span className="absolute -top-1 -right-1 w-2 h-2 bg-bellboy-gold rounded-full"></span>
         </button>
       </div>
     </header>

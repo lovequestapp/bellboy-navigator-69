@@ -29,28 +29,18 @@ const UpcomingStayCard: React.FC<UpcomingStayCardProps> = ({ hotel }) => {
   const days = daysUntilCheckIn();
   
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-border hover:shadow-lg transition-shadow duration-300">
-      <div className="relative h-32 overflow-hidden">
+    <div className="relative bg-white/95 rounded-lg shadow-luxury overflow-hidden border border-white/30 transition-all duration-300 hover:shadow-premium group">
+      <div className="relative h-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-bellboy/30 to-bellboy-navy/40 mix-blend-multiply z-10 opacity-60 group-hover:opacity-50 transition-opacity"></div>
         <img 
           src={hotel.image} 
           alt={hotel.name} 
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60"></div>
-        <div className="absolute bottom-3 left-3 right-3 text-white">
-          <h3 className="font-serif font-medium text-lg truncate">{hotel.name}</h3>
-          <div className="flex items-center text-sm">
-            <MapPin size={12} className="mr-1" />
-            <span className="truncate">{hotel.location}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-3">
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm z-20">
           <div className="flex items-center">
-            <Clock size={16} className="text-bellboy mr-2" />
-            <span className="text-sm font-medium">
+            <Clock size={14} className="text-bellboy mr-1.5" />
+            <span className="text-xs font-medium">
               {days > 0 
                 ? `${days} day${days > 1 ? 's' : ''} until check-in` 
                 : days === 0 
@@ -59,16 +49,26 @@ const UpcomingStayCard: React.FC<UpcomingStayCardProps> = ({ hotel }) => {
             </span>
           </div>
         </div>
-        
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent h-20 z-10"></div>
+        <div className="absolute bottom-3 left-3 right-3 text-white z-20">
+          <h3 className="font-serif font-medium text-xl tracking-tight">{hotel.name}</h3>
+          <div className="flex items-center text-sm text-white/90">
+            <MapPin size={14} className="mr-1" />
+            <span className="truncate">{hotel.location}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-4">
         <div className="text-sm text-muted-foreground mb-4">
-          {hotel.checkIn} - {hotel.checkOut}
+          <span className="font-medium">{hotel.checkIn}</span> - <span className="font-medium">{hotel.checkOut}</span>
         </div>
         
         <Button 
-          className="w-full bg-bellboy hover:bg-bellboy-light"
+          className="w-full bg-gradient-to-r from-bellboy to-bellboy-navy hover:from-bellboy-navy hover:to-bellboy border-none shadow-sm group-hover:shadow-md transition-all duration-300"
           onClick={() => navigate("/hotels")}
         >
-          View Reservation <ArrowRight size={16} className="ml-2" />
+          View Reservation <ArrowRight size={16} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
         </Button>
       </div>
     </div>

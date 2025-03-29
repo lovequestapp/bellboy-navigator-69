@@ -25,10 +25,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
 
   return (
     <div 
-      className="bellboy-card flex items-center mb-4 animate-fade-in cursor-pointer group hover:shadow-lg transition-all duration-300"
+      className="glass-card flex items-center mb-4 animate-fade-in cursor-pointer group transition-all duration-300 hover:shadow-luxury-sm"
       onClick={handleClick}
     >
-      <div className="mr-4 p-3.5 bg-bellboy-accent rounded-full group-hover:bg-bellboy-gold/20 transition-colors duration-300">
+      <div className="mr-4 p-3.5 bg-gradient-to-br from-bellboy-accent/40 to-bellboy-gold/20 rounded-full group-hover:from-bellboy-gold/30 group-hover:to-bellboy-accent/30 transition-colors duration-300">
         <div className="text-bellboy">
           {service.icon}
         </div>
@@ -39,7 +39,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
       </div>
       <Button 
         variant="outline" 
-        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy"
+        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy group-hover:shadow-md"
         size="sm"
         onClick={handleOrderClick}
       >

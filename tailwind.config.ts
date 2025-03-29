@@ -55,11 +55,14 @@ export default {
 				},
 				bellboy: {
 					DEFAULT: 'var(--bellboy-color)', // Using CSS variable
-					light: '#2A3F7E',
+					light: '#1E5F8C',
 					dark: '#071337',
 					gold: '#D4AF37',
 					silver: '#C0C0C0',
-					accent: '#E8D8A3' // light gold
+					accent: '#E8D8A3', // light gold
+					cream: '#F9F5EB',
+					navy: '#0F3460',
+					charcoal: '#16213E'
 				}
 			},
 			borderRadius: {
@@ -87,6 +90,10 @@ export default {
 				'pulse-subtle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-500px 0' },
+					'100%': { backgroundPosition: '500px 0' }
 				}
 			},
 			animation: {
@@ -94,11 +101,18 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'slide-in': 'slide-in 0.3s ease-out',
-				'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite'
+				'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
+				'shimmer': 'shimmer 2s infinite linear'
 			},
 			fontFamily: {
 				serif: ['Playfair Display', 'serif'],
-				sans: ['Inter', 'sans-serif']
+				sans: ['Inter', 'sans-serif'],
+				display: ['Montserrat', 'sans-serif']
+			},
+			boxShadow: {
+				'luxury': '0 10px 50px -12px rgba(0, 0, 0, 0.25)',
+				'luxury-sm': '0 4px 20px -2px rgba(0, 0, 0, 0.18)',
+				'premium': '0 25px 50px -12px rgba(0, 0, 0, 0.1)'
 			}
 		}
 	},
