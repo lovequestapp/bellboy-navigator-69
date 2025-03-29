@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Utensils, Bed, DoorOpen, Bell } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import ServiceCard from "@/components/ui/ServiceCard";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data
 const services = [
@@ -44,7 +45,14 @@ const Services: React.FC = () => {
 
   const handleServiceClick = (serviceId: string) => {
     console.log("Service clicked:", serviceId);
-    // Navigate to service detail page
+    navigate(`/services/${serviceId}`);
+  };
+
+  const handleRecommendationClick = () => {
+    toast({
+      title: "Coffee Service Scheduled",
+      description: "Your daily morning coffee will be delivered at 7:30 AM.",
+    });
   };
 
   return (
@@ -76,7 +84,12 @@ const Services: React.FC = () => {
           <div className="bellboy-card">
             <h3 className="font-serif text-lg font-medium text-foreground mb-2">Morning Coffee Service</h3>
             <p className="text-sm text-muted-foreground mb-4">Based on your preferences, we recommend our premium coffee service every morning at 7:30 AM.</p>
-            <button className="bellboy-button-primary">Set Up Daily Delivery</button>
+            <button 
+              className="bellboy-button-primary"
+              onClick={handleRecommendationClick}
+            >
+              Set Up Daily Delivery
+            </button>
           </div>
         </div>
       </div>
