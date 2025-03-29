@@ -27,6 +27,13 @@ import ActivityTracking from "./pages/admin/ActivityTracking";
 import SupportTickets from "./pages/admin/SupportTickets";
 import HotelListings from "./pages/admin/HotelListings";
 import IntegrationsManager from "./pages/admin/IntegrationsManager";
+import Promotions from "./pages/admin/Promotions";
+import FeaturedDestinations from "./pages/admin/FeaturedDestinations";
+import ApiStatus from "./pages/admin/ApiStatus";
+import Configuration from "./pages/admin/Configuration";
+import ThemeSettings from "./pages/admin/ThemeSettings";
+import EmailTemplates from "./pages/admin/EmailTemplates";
+import FeatureToggles from "./pages/admin/FeatureToggles";
 
 // Set default accent color for luxury aesthetics
 document.documentElement.style.setProperty("--bellboy-color", "#0F3460");
@@ -97,6 +104,13 @@ const App = () => {
                   <Route path="/admin/tickets" element={<SupportTickets />} />
                   <Route path="/admin/hotels" element={<HotelListings />} />
                   <Route path="/admin/integrations" element={<IntegrationsManager />} />
+                  <Route path="/admin/promotions" element={<Promotions />} />
+                  <Route path="/admin/destinations" element={<FeaturedDestinations />} />
+                  <Route path="/admin/api-status" element={<ApiStatus />} />
+                  <Route path="/admin/configuration" element={<Configuration />} />
+                  <Route path="/admin/theme" element={<ThemeSettings />} />
+                  <Route path="/admin/emails" element={<EmailTemplates />} />
+                  <Route path="/admin/features" element={<FeatureToggles />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>

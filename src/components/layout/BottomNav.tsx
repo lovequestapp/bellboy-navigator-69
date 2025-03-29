@@ -38,6 +38,11 @@ const BottomNav: React.FC = () => {
     },
   ];
 
+  // Don't show bottom nav on admin pages
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-border/30 px-2 py-3 flex justify-around items-center z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]">
       {navItems.map((item) => (
