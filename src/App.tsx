@@ -20,6 +20,13 @@ import VirtualConcierge from "./pages/VirtualConcierge";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserProfiles from "./pages/admin/UserProfiles";
+import ActivityTracking from "./pages/admin/ActivityTracking";
+import SupportTickets from "./pages/admin/SupportTickets";
+import HotelListings from "./pages/admin/HotelListings";
+
 // Set default accent color for luxury aesthetics
 document.documentElement.style.setProperty("--bellboy-color", "#0F3460");
 
@@ -81,6 +88,14 @@ const App = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/check-in" element={<CheckIn />} />
                   <Route path="/concierge" element={<VirtualConcierge />} />
+
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<UserProfiles />} />
+                  <Route path="/admin/activity" element={<ActivityTracking />} />
+                  <Route path="/admin/tickets" element={<SupportTickets />} />
+                  <Route path="/admin/hotels" element={<HotelListings />} />
+                  
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
