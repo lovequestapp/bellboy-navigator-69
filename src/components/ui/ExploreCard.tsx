@@ -1,6 +1,7 @@
 
 import React from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
+import { Button } from "./button";
 
 interface ExploreCardProps {
   place: {
@@ -17,17 +18,18 @@ interface ExploreCardProps {
 const ExploreCard: React.FC<ExploreCardProps> = ({ place, onClick }) => {
   return (
     <div 
-      className="bellboy-card mb-4 animate-fade-in cursor-pointer"
+      className="bellboy-card mb-5 animate-fade-in cursor-pointer hover:shadow-lg transition-all duration-300"
       onClick={() => onClick(place.id)}
     >
-      <div className="relative h-40 mb-2 rounded-md overflow-hidden">
+      <div className="relative h-44 mb-3 rounded-lg overflow-hidden">
         <img
           src={place.image}
           alt={place.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
         />
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
-          ★ {place.rating}/5
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-medium flex items-center">
+          <Star size={12} className="mr-1 text-bellboy-gold fill-bellboy-gold" />
+          {place.rating}/5
         </div>
       </div>
       
@@ -35,13 +37,15 @@ const ExploreCard: React.FC<ExploreCardProps> = ({ place, onClick }) => {
         <h3 className="font-serif text-lg font-medium text-foreground">{place.name}</h3>
         <p className="text-sm text-muted-foreground">{place.category}</p>
         <div className="flex items-center mt-2 text-sm text-muted-foreground">
-          <MapPin size={14} className="mr-1" />
+          <MapPin size={14} className="mr-1.5 text-bellboy" />
           <span>{place.distance} away</span>
         </div>
       </div>
       
       <div className="mt-4">
-        <button className="bellboy-button-primary w-full">View Details</button>
+        <Button className="w-full bg-bellboy hover:bg-bellboy-light text-white">
+          View Details
+        </Button>
       </div>
     </div>
   );

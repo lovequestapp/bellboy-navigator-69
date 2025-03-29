@@ -1,5 +1,7 @@
 
 import React from "react";
+import { Button } from "./button";
+import { ArrowRight } from "lucide-react";
 
 interface ServiceCardProps {
   service: {
@@ -14,17 +16,25 @@ interface ServiceCardProps {
 const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
   return (
     <div 
-      className="bellboy-card flex items-center mb-4 animate-fade-in cursor-pointer"
+      className="bellboy-card flex items-center mb-4 animate-fade-in cursor-pointer group hover:shadow-lg transition-all duration-300"
       onClick={() => onClick(service.id)}
     >
-      <div className="mr-4 p-3 bg-bellboy-accent rounded-full">
-        {service.icon}
+      <div className="mr-4 p-3.5 bg-bellboy-accent rounded-full group-hover:bg-bellboy-gold/20 transition-colors duration-300">
+        <div className="text-bellboy">
+          {service.icon}
+        </div>
       </div>
       <div className="flex-1">
         <h3 className="font-serif text-lg font-medium text-foreground">{service.name}</h3>
-        <p className="text-sm text-muted-foreground">{service.description}</p>
+        <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
       </div>
-      <button className="bellboy-button-primary text-sm">Order</button>
+      <Button 
+        variant="outline" 
+        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy"
+        size="sm"
+      >
+        Order <ArrowRight className="ml-1 h-4 w-4" />
+      </Button>
     </div>
   );
 };
