@@ -1,13 +1,14 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Users, Settings, Hotel, Tag, MapPin, BarChart, 
-  Link, Palette, Mail, ToggleRight, MessageSquare, Activity, Layers
+  Link, Palette, Mail, ToggleRight, MessageSquare, Activity, Layers, LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -66,6 +67,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
     }
   }, [isAuthenticated, user, navigate]);
 
+  const handleExitAdmin = () => {
+    toast({
+      title: "Exiting Admin Dashboard",
+      description: "Returning to main application"
+    });
+    navigate("/");
+  };
+
   if (!isAuthenticated || !user) {
     return <div className="p-8 text-center">Loading...</div>;
   }
@@ -74,9 +83,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-white p-4 hidden md:block overflow-y-auto">
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-2">BellBoy Admin</h2>
-          <p className="text-sm text-slate-400">Welcome, {user.name}</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold mb-2">BellBoy Admin</h2>
+            <p className="text-sm text-slate-400">Welcome, {user.name}</p>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleExitAdmin}
+            className="text-slate-400 hover:text-white hover:bg-slate-800"
+            title="Exit Admin Dashboard"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
         
         {sidebarItems.map((group, index) => (
@@ -105,7 +125,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
       {/* Mobile nav - shown on small screens */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white z-50">
         <div className="flex justify-around p-2">
-          {sidebarItems.slice(0, 4).map((group, index) => (
+          {sidebarItems.slice(0, 3).map((group, index) => (
             <button
               key={index}
               onClick={() => navigate(group.items[0].path)}
@@ -115,6 +135,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
               <span className="text-xs mt-1">{group.group}</span>
             </button>
           ))}
+          <button
+            onClick={handleExitAdmin}
+            className="flex flex-col items-center justify-center py-1 px-3"
+          >
+            <LogOut size={20} />
+            <span className="text-xs mt-1">Exit</span>
+          </button>
         </div>
       </div>
 

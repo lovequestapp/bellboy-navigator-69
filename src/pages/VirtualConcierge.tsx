@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { getUpcomingHotels } from "@/services/hotelService";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import VirtualConciergeChat from "@/components/VirtualConciergeChat";
 
 interface ConciergeService {
   id: string;
@@ -25,6 +27,7 @@ const VirtualConcierge: React.FC = () => {
   const upcomingStays = getUpcomingHotels();
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState<string>("explore");
   
   // Mock data for concierge services
   const conciergeServices: ConciergeService[] = [
@@ -90,139 +93,152 @@ const VirtualConcierge: React.FC = () => {
       <div className="space-y-6">
         <div className="space-y-2">
           <h1 className="text-3xl font-serif font-semibold">Virtual Concierge</h1>
-          <p className="text-muted-foreground">Curated experiences for your upcoming stays</p>
+          <p className="text-muted-foreground">Curated experiences and assistance for your stay</p>
         </div>
 
-        {upcomingStays.length === 0 ? (
-          <div className="bellboy-card text-center p-8">
-            <h2 className="text-xl font-serif font-semibold mb-4">No Upcoming Stays</h2>
-            <p className="text-muted-foreground mb-6">Add a hotel stay to see personalized recommendations.</p>
-            <Button onClick={() => navigate('/check-in')} className="bg-bellboy hover:bg-bellboy-light">
-              Add New Stay
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="bg-gradient-to-r from-bellboy to-bellboy-light rounded-lg p-6 text-white">
-              <div className="flex items-center gap-3 mb-3">
-                <Calendar className="h-6 w-6" />
-                <h2 className="text-xl font-serif font-medium">Upcoming Stay</h2>
+        <Tabs defaultValue="explore" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="explore">Explore Experiences</TabsTrigger>
+            <TabsTrigger value="chat">Concierge Chat</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="explore" className="mt-6">
+            {upcomingStays.length === 0 ? (
+              <div className="bellboy-card text-center p-8">
+                <h2 className="text-xl font-serif font-semibold mb-4">No Upcoming Stays</h2>
+                <p className="text-muted-foreground mb-6">Add a hotel stay to see personalized recommendations.</p>
+                <Button onClick={() => navigate('/check-in')} className="bg-bellboy hover:bg-bellboy-light">
+                  Add New Stay
+                </Button>
               </div>
-              <h3 className="text-lg font-serif">{upcomingStays[0].name}</h3>
-              <p className="opacity-90">{upcomingStays[0].location}</p>
-              <p className="mt-2 opacity-90">{upcomingStays[0].checkIn} - {upcomingStays[0].checkOut}</p>
-            </div>
-
-            <div className="flex gap-2 overflow-x-auto py-2 scrollbar-hide">
-              <Button 
-                variant={selectedFilter === "all" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setSelectedFilter("all")}
-                className={selectedFilter === "all" ? "bg-bellboy hover:bg-bellboy-light" : ""}
-              >
-                All
-              </Button>
-              <Button 
-                variant={selectedFilter === "dining" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setSelectedFilter("dining")}
-                className={selectedFilter === "dining" ? "bg-bellboy hover:bg-bellboy-light" : ""}
-              >
-                Dining
-              </Button>
-              <Button 
-                variant={selectedFilter === "entertainment" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setSelectedFilter("entertainment")}
-                className={selectedFilter === "entertainment" ? "bg-bellboy hover:bg-bellboy-light" : ""}
-              >
-                Entertainment
-              </Button>
-              <Button 
-                variant={selectedFilter === "culture" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setSelectedFilter("culture")}
-                className={selectedFilter === "culture" ? "bg-bellboy hover:bg-bellboy-light" : ""}
-              >
-                Culture
-              </Button>
-              <Button 
-                variant={selectedFilter === "exclusive" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setSelectedFilter("exclusive")}
-                className={selectedFilter === "exclusive" ? "bg-bellboy hover:bg-bellboy-light" : ""}
-              >
-                Exclusive
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <h2 className="text-xl font-serif font-semibold">Recommended Experiences</h2>
-              
-              <div className="space-y-4">
-                {filteredServices.map((service) => (
-                  <div 
-                    key={service.id} 
-                    className="relative bg-white rounded-lg overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className={`flex flex-col ${isMobile ? "" : "md:flex-row"}`}>
-                      <div className={`${isMobile ? "w-full" : "md:w-1/3"} h-48 md:h-auto relative`}>
-                        <img 
-                          src={service.image} 
-                          alt={service.title} 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                          {service.price}
-                        </div>
-                      </div>
-                      <div className={`p-4 ${isMobile ? "w-full" : "md:w-2/3"} flex flex-col justify-between`}>
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="p-1.5 bg-bellboy-accent rounded-full text-bellboy">
-                              {service.icon}
-                            </div>
-                            <h3 className="font-serif text-lg font-medium">{service.title}</h3>
-                          </div>
-                          
-                          <p className="text-muted-foreground mb-3">{service.description}</p>
-                          
-                          <div className={`${isMobile ? "flex flex-col gap-2" : "flex items-center gap-4"} text-sm`}>
-                            <div className="flex items-center">
-                              <Calendar size={14} className="mr-1 text-bellboy" />
-                              <span>{service.date}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <Star size={14} className="mr-1 text-bellboy" />
-                              <span className={isMobile ? "line-clamp-1" : ""}>{service.location}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className={`${isMobile ? "flex flex-col gap-3" : "flex justify-between items-center"} mt-4`}>
-                          <div className="flex flex-wrap gap-2">
-                            {service.tags.map(tag => (
-                              <span key={tag} className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                          <Button 
-                            size="sm" 
-                            className="bg-bellboy hover:bg-bellboy-light"
-                            onClick={() => handleBookService(service.id)}
-                          >
-                            Book Now
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+            ) : (
+              <>
+                <div className="bg-gradient-to-r from-bellboy to-bellboy-light rounded-lg p-6 text-white">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Calendar className="h-6 w-6" />
+                    <h2 className="text-xl font-serif font-medium">Upcoming Stay</h2>
                   </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
+                  <h3 className="text-lg font-serif">{upcomingStays[0].name}</h3>
+                  <p className="opacity-90">{upcomingStays[0].location}</p>
+                  <p className="mt-2 opacity-90">{upcomingStays[0].checkIn} - {upcomingStays[0].checkOut}</p>
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto py-2 scrollbar-hide">
+                  <Button 
+                    variant={selectedFilter === "all" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedFilter("all")}
+                    className={selectedFilter === "all" ? "bg-bellboy hover:bg-bellboy-light" : ""}
+                  >
+                    All
+                  </Button>
+                  <Button 
+                    variant={selectedFilter === "dining" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedFilter("dining")}
+                    className={selectedFilter === "dining" ? "bg-bellboy hover:bg-bellboy-light" : ""}
+                  >
+                    Dining
+                  </Button>
+                  <Button 
+                    variant={selectedFilter === "entertainment" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedFilter("entertainment")}
+                    className={selectedFilter === "entertainment" ? "bg-bellboy hover:bg-bellboy-light" : ""}
+                  >
+                    Entertainment
+                  </Button>
+                  <Button 
+                    variant={selectedFilter === "culture" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedFilter("culture")}
+                    className={selectedFilter === "culture" ? "bg-bellboy hover:bg-bellboy-light" : ""}
+                  >
+                    Culture
+                  </Button>
+                  <Button 
+                    variant={selectedFilter === "exclusive" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedFilter("exclusive")}
+                    className={selectedFilter === "exclusive" ? "bg-bellboy hover:bg-bellboy-light" : ""}
+                  >
+                    Exclusive
+                  </Button>
+                </div>
+
+                <div className="space-y-6">
+                  <h2 className="text-xl font-serif font-semibold">Recommended Experiences</h2>
+                  
+                  <div className="space-y-4">
+                    {filteredServices.map((service) => (
+                      <div 
+                        key={service.id} 
+                        className="relative bg-white rounded-lg overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className={`flex flex-col ${isMobile ? "" : "md:flex-row"}`}>
+                          <div className={`${isMobile ? "w-full" : "md:w-1/3"} h-48 md:h-auto relative`}>
+                            <img 
+                              src={service.image} 
+                              alt={service.title} 
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              {service.price}
+                            </div>
+                          </div>
+                          <div className={`p-4 ${isMobile ? "w-full" : "md:w-2/3"} flex flex-col justify-between`}>
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="p-1.5 bg-bellboy-accent rounded-full text-bellboy">
+                                  {service.icon}
+                                </div>
+                                <h3 className="font-serif text-lg font-medium">{service.title}</h3>
+                              </div>
+                              
+                              <p className="text-muted-foreground mb-3">{service.description}</p>
+                              
+                              <div className={`${isMobile ? "flex flex-col gap-2" : "flex items-center gap-4"} text-sm`}>
+                                <div className="flex items-center">
+                                  <Calendar size={14} className="mr-1 text-bellboy" />
+                                  <span>{service.date}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Star size={14} className="mr-1 text-bellboy" />
+                                  <span className={isMobile ? "line-clamp-1" : ""}>{service.location}</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className={`${isMobile ? "flex flex-col gap-3" : "flex justify-between items-center"} mt-4`}>
+                              <div className="flex flex-wrap gap-2">
+                                {service.tags.map(tag => (
+                                  <span key={tag} className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-bellboy hover:bg-bellboy-light"
+                                onClick={() => handleBookService(service.id)}
+                              >
+                                Book Now
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="chat" className="mt-6">
+            <VirtualConciergeChat />
+          </TabsContent>
+        </Tabs>
       </div>
     </PageContainer>
   );
