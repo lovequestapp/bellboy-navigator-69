@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Bed, Bell, MapPin, Heart, User } from "lucide-react";
+import { Bed, Bell, MapPin, ChefHat, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BottomNav: React.FC = () => {
@@ -25,9 +25,9 @@ const BottomNav: React.FC = () => {
       path: "/explore",
     },
     {
-      name: "Rewards",
-      icon: Heart,
-      path: "/rewards",
+      name: "Concierge",
+      icon: ChefHat,
+      path: "/concierge",
     },
     {
       name: "Profile",
@@ -37,7 +37,7 @@ const BottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border px-2 py-3 flex justify-around items-center z-10">
+    <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-md bg-opacity-90 border-t border-border px-2 py-3 flex justify-around items-center z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
       {navItems.map((item) => (
         <button
           key={item.name}

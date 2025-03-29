@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import CheckIn from "./pages/CheckIn";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
+import VirtualConcierge from "./pages/VirtualConcierge";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/concierge" element={<VirtualConcierge />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>

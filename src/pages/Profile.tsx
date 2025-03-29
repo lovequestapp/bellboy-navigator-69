@@ -1,203 +1,129 @@
 
-import React, { useState } from "react";
-import { User, Settings, CreditCard, LogOut, Bell, Moon, Shield, ArrowRight, Palette } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Settings, CreditCard, Heart, LogOut, ChevronRight } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
-import { Switch } from "@/components/ui/switch";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { usePreferences } from "@/contexts/PreferencesContext";
-import PaymentMethodsModal from "@/components/modals/PaymentMethodsModal";
 import PreferencesModal from "@/components/modals/PreferencesModal";
-import ColorPicker from "@/components/ui/ColorPicker";
-import { toast } from "@/hooks/use-toast";
+import PaymentMethodsModal from "@/components/modals/PaymentMethodsModal";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { preferences, updatePreferences } = usePreferences();
-  
-  // State for collapsible sections
-  const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
-  
-  // State for modals
-  const [paymentMethodsOpen, setPaymentMethodsOpen] = useState(false);
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [showPreferences, setShowPreferences] = React.useState(false);
+  const [showPaymentMethods, setShowPaymentMethods] = React.useState(false);
 
-  // Handle notifications toggle
-  const handleNotificationsToggle = (checked: boolean) => {
-    updatePreferences({ notifications: checked });
-  };
+  const menuItems = [
+    {
+      icon: <Settings size={20} className="text-bellboy" />,
+      title: "Preferences",
+      description: "App settings and customization",
+      onClick: () => setShowPreferences(true),
+    },
+    {
+      icon: <CreditCard size={20} className="text-bellboy" />,
+      title: "Payment Methods",
+      description: "Manage your saved payment methods",
+      onClick: () => setShowPaymentMethods(true),
+    },
+    {
+      icon: <Heart size={20} className="text-bellboy" />,
+      title: "Rewards & Points",
+      description: "View your rewards status and history",
+      onClick: () => navigate("/rewards"),
+    },
+  ];
 
-  // Handle dark mode toggle
-  const handleDarkModeToggle = (checked: boolean) => {
-    updatePreferences({ darkMode: checked });
-  };
-
-  // Handle accent color change
-  const handleAccentColorChange = (color: string) => {
-    updatePreferences({ accentColor: color });
-    
+  const handleLogout = () => {
     toast({
-      title: "App appearance updated",
-      description: "Your color preference has been saved",
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
     });
-  };
-
-  // Handle button clicks
-  const handlePaymentMethodsClick = () => {
-    setPaymentMethodsOpen(true);
-  };
-
-  const handlePreferencesClick = () => {
-    setPreferencesOpen(true);
-  };
-
-  const handlePrivacySettingsClick = () => {
-    toast({
-      title: "Privacy Settings",
-      description: "This feature is coming soon!",
-    });
+    // In a real app, perform actual logout logic here
+    setTimeout(() => {
+      navigate("/landing");
+    }, 1500);
   };
 
   return (
     <PageContainer>
       <div className="space-y-6">
-        <div className="flex items-center mb-8">
-          <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center mr-4"
-            style={{ backgroundColor: preferences.accentColor }}
-          >
-            <User size={32} className="text-white" />
-          </div>
+        {/* Profile Header */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-20 w-20 border-2 border-border">
+            <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80" />
+            <AvatarFallback>JD</AvatarFallback>
+          </Avatar>
           <div>
-            <h2 className="text-xl font-serif font-semibold">{user?.name || "Guest User"}</h2>
-            <p className="text-sm text-muted-foreground">{user?.email || "guest@example.com"}</p>
-            <div className="flex items-center mt-1">
-              <span className="text-xs px-2 py-1 bg-bellboy-accent text-bellboy rounded-full font-medium">
-                {user?.tier || "Guest"}
-              </span>
-              <span className="text-xs text-muted-foreground ml-2">
-                {user?.memberSince ? `Member since ${user.memberSince}` : "Not a member yet"}
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bellboy-card">
-          <h3 className="font-serif text-lg font-medium text-foreground mb-4">Account Settings</h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between py-2 border-b">
-              <div className="flex items-center">
-                <Bell size={18} className="mr-3" style={{ color: preferences.accentColor }} />
-                <span>Notifications</span>
-              </div>
-              <Switch 
-                checked={preferences.notifications}
-                onCheckedChange={handleNotificationsToggle}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between py-2 border-b">
-              <div className="flex items-center">
-                <Moon size={18} className="mr-3" style={{ color: preferences.accentColor }} />
-                <span>Dark Mode</span>
-              </div>
-              <Switch 
-                checked={preferences.darkMode}
-                onCheckedChange={handleDarkModeToggle}
-              />
-            </div>
-            
-            <Collapsible 
-              open={isAppearanceOpen} 
-              onOpenChange={setIsAppearanceOpen}
-              className="py-2 border-b"
+            <h1 className="text-2xl font-serif font-semibold">Jane Doe</h1>
+            <p className="text-muted-foreground">Premium Member</p>
+            <p className="text-sm text-muted-foreground">jane.doe@example.com</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2 text-xs px-2 py-0 h-7"
+              onClick={() => navigate("/profile/edit")}
             >
-              <CollapsibleTrigger className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <Palette size={18} className="mr-3" style={{ color: preferences.accentColor }} />
-                  <span>App Appearance</span>
-                </div>
-                <ArrowRight 
-                  size={16} 
-                  className={`text-muted-foreground transition-transform ${isAppearanceOpen ? 'rotate-90' : ''}`} 
-                />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Accent Color</h4>
-                    <ColorPicker
-                      selectedColor={preferences.accentColor}
-                      onChange={handleAccentColorChange}
-                    />
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-            
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center">
-                <Shield size={18} className="mr-3" style={{ color: preferences.accentColor }} />
-                <span>Privacy Settings</span>
-              </div>
-              <button 
-                className="text-sm" 
-                style={{ color: preferences.accentColor }}
-                onClick={handlePrivacySettingsClick}
-              >
-                Manage
-              </button>
+              Edit Profile
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats Card */}
+        <div className="bellboy-card">
+          <h2 className="text-lg font-serif font-medium mb-4">Your Stats</h2>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-serif font-medium text-bellboy">12</p>
+              <p className="text-sm text-muted-foreground">Stays</p>
+            </div>
+            <div>
+              <p className="text-2xl font-serif font-medium text-bellboy">4,350</p>
+              <p className="text-sm text-muted-foreground">Points</p>
+            </div>
+            <div>
+              <p className="text-2xl font-serif font-medium text-bellboy">Gold</p>
+              <p className="text-sm text-muted-foreground">Status</p>
             </div>
           </div>
         </div>
-        
-        <div className="space-y-4">
-          <button 
-            className="bellboy-card w-full flex items-center justify-between p-4"
-            onClick={handlePaymentMethodsClick}
-          >
-            <div className="flex items-center">
-              <CreditCard size={20} className="mr-3" style={{ color: preferences.accentColor }} />
-              <span>Payment Methods</span>
-            </div>
-            <ArrowRight size={16} className="text-muted-foreground" />
-          </button>
-          
-          <button 
-            className="bellboy-card w-full flex items-center justify-between p-4"
-            onClick={handlePreferencesClick}
-          >
-            <div className="flex items-center">
-              <Settings size={20} className="mr-3" style={{ color: preferences.accentColor }} />
-              <span>Preferences</span>
-            </div>
-            <ArrowRight size={16} className="text-muted-foreground" />
-          </button>
-          
-          <button 
-            className="bellboy-card w-full flex items-center justify-between p-4 text-destructive"
-            onClick={logout}
-          >
-            <div className="flex items-center">
-              <LogOut size={20} className="mr-3" />
-              <span>Log Out</span>
-            </div>
-          </button>
+
+        {/* Menu Items */}
+        <div className="space-y-2">
+          {menuItems.map((item, index) => (
+            <button
+              key={index}
+              className="w-full bellboy-card flex items-center justify-between p-4 text-left hover:bg-muted/30 transition-colors"
+              onClick={item.onClick}
+            >
+              <div className="flex items-center">
+                <div className="mr-3">{item.icon}</div>
+                <div>
+                  <h3 className="font-medium">{item.title}</h3>
+                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                </div>
+              </div>
+              <ChevronRight size={18} className="text-muted-foreground" />
+            </button>
+          ))}
         </div>
+
+        {/* Logout Button */}
+        <Button 
+          variant="outline" 
+          className="w-full mt-6 border-dashed text-destructive hover:text-destructive"
+          onClick={handleLogout}
+        >
+          <LogOut size={16} className="mr-2" />
+          Logout
+        </Button>
       </div>
-      
+
       {/* Modals */}
-      <PaymentMethodsModal 
-        open={paymentMethodsOpen} 
-        onOpenChange={setPaymentMethodsOpen} 
-      />
-      
-      <PreferencesModal 
-        open={preferencesOpen} 
-        onOpenChange={setPreferencesOpen} 
-      />
+      <PreferencesModal open={showPreferences} onOpenChange={setShowPreferences} />
+      <PaymentMethodsModal open={showPaymentMethods} onOpenChange={setShowPaymentMethods} />
     </PageContainer>
   );
 };
