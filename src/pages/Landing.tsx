@@ -17,7 +17,8 @@ import {
   Gift,
   ArrowRight,
   Check,
-  Smartphone
+  Smartphone,
+  Clock // Added the missing Clock icon import
 } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import { 
