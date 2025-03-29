@@ -1,0 +1,59 @@
+
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Bell, ArrowLeft } from "lucide-react";
+
+interface HeaderProps {
+  showBackButton?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/":
+        return "BellBoy";
+      case "/hotels":
+        return "Your Hotels";
+      case "/services":
+        return "Hotel Services";
+      case "/explore":
+        return "Explore";
+      case "/rewards":
+        return "Loyalty Rewards";
+      case "/profile":
+        return "Profile";
+      case "/check-in":
+        return "Check In";
+      case "/check-out":
+        return "Check Out";
+      default:
+        return "BellBoy";
+    }
+  };
+
+  return (
+    <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border z-10">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="flex items-center">
+          {showBackButton && (
+            <button 
+              onClick={() => navigate(-1)}
+              className="mr-3 text-foreground hover:text-bellboy transition-colors"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <h1 className="text-lg font-serif font-semibold">{getPageTitle()}</h1>
+        </div>
+        <button className="text-foreground hover:text-bellboy transition-colors">
+          <Bell size={20} />
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
