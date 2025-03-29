@@ -3,9 +3,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Bed, MapPin, Heart, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getUpcomingHotels } from "@/services/hotelService";
+import UpcomingStayCard from "@/components/ui/UpcomingStayCard";
 
 const Index = () => {
   const navigate = useNavigate();
+  const upcomingHotels = getUpcomingHotels();
 
   const handleFeatureClick = (route: string) => {
     navigate(route);
@@ -19,6 +22,14 @@ const Index = () => {
       </header>
       
       <main className="flex-1 p-6">
+        {/* Show upcoming stay if available */}
+        {upcomingHotels.length > 0 && (
+          <section className="mb-10 animate-fade-in">
+            <h2 className="text-xl font-serif font-semibold mb-4">Your Next Stay</h2>
+            <UpcomingStayCard hotel={upcomingHotels[0]} />
+          </section>
+        )}
+        
         <section className="mb-10 animate-fade-in">
           <h2 className="text-2xl font-serif font-semibold mb-6">Elevate Your Stay</h2>
           <div className="prose text-muted-foreground">
@@ -30,7 +41,7 @@ const Index = () => {
               className="w-full py-6 bg-bellboy hover:bg-bellboy-light"
               onClick={() => navigate("/hotels")}
             >
-              Get Started
+              {upcomingHotels.length > 0 ? "Manage Your Stays" : "Get Started"}
             </Button>
             <Button 
               variant="outline" 
