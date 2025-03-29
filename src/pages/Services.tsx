@@ -241,7 +241,7 @@ const Services: React.FC = () => {
                             value={option.id} 
                             id={option.id} 
                             checked={field.value === option.id}
-                            onCheckedChange={() => field.onChange(option.id)}
+                            onChange={() => field.onChange(option.id)}
                           />
                           <div className="flex-1 space-y-1">
                             <Label htmlFor={option.id} className="font-medium">{option.name}</Label>
