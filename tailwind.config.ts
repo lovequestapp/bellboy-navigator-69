@@ -54,7 +54,7 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				bellboy: {
-					DEFAULT: '#0F1E54', // deep navy blue
+					DEFAULT: 'var(--bellboy-color)', // Using CSS variable
 					light: '#2A3F7E',
 					dark: '#071337',
 					gold: '#D4AF37',

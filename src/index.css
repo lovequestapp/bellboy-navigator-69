@@ -36,6 +36,8 @@
     --ring: 222 73% 20%;
 
     --radius: 0.5rem;
+
+    --bellboy-color: #0F1E54;
   }
 
   .dark {
@@ -99,4 +101,23 @@
   .bellboy-input {
     @apply border border-input rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring;
   }
+}
+
+/* Dark mode support for cards */
+.dark .bellboy-card {
+  @apply bg-card border-border;
+}
+
+/* Dynamic accent color support */
+.text-bellboy {
+  color: var(--bellboy-color) !important;
+}
+
+.bg-bellboy {
+  background-color: var(--bellboy-color) !important;
+}
+
+.hover\:bg-bellboy:hover {
+  background-color: var(--bellboy-color) !important;
+  opacity: 0.9;
 }
