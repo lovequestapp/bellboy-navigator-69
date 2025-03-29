@@ -164,7 +164,7 @@ const Services: React.FC = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] p-6">
+        <DialogContent className="sm:max-w-[500px] p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif">Configure Coffee Service</DialogTitle>
             <DialogDescription>
@@ -172,7 +172,7 @@ const Services: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4 space-y-5">
+          <div className="py-4 space-y-5 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
             <div className="space-y-3">
               <h4 className="font-medium text-sm">Select Your Coffee</h4>
               <RadioGroup
@@ -228,7 +228,7 @@ const Services: React.FC = () => {
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="mt-2">
             <Button 
               variant="outline" 
               onClick={() => setIsDialogOpen(false)}
