@@ -1,19 +1,23 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Settings, CreditCard, Heart, LogOut, ChevronRight } from "lucide-react";
+import { User, Settings, CreditCard, Heart, LogOut, ChevronRight, LayoutDashboard, ShieldCheck } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import PreferencesModal from "@/components/modals/PreferencesModal";
 import PaymentMethodsModal from "@/components/modals/PaymentMethodsModal";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [showPreferences, setShowPreferences] = React.useState(false);
   const [showPaymentMethods, setShowPaymentMethods] = React.useState(false);
+
+  const isAdmin = user?.tier === "Admin";
 
   const menuItems = [
     {
@@ -57,9 +61,9 @@ const Profile: React.FC = () => {
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-serif font-semibold">Jane Doe</h1>
-            <p className="text-muted-foreground">Premium Member</p>
-            <p className="text-sm text-muted-foreground">jane.doe@example.com</p>
+            <h1 className="text-2xl font-serif font-semibold">{user?.name || "Jane Doe"}</h1>
+            <p className="text-muted-foreground">{user?.tier || "Premium Member"}</p>
+            <p className="text-sm text-muted-foreground">{user?.email || "jane.doe@example.com"}</p>
             <Button 
               variant="outline" 
               size="sm" 
@@ -89,6 +93,28 @@ const Profile: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Admin Dashboard Access - Only shown for admin users */}
+        {isAdmin && (
+          <div className="bellboy-card bg-slate-100 border-2 border-slate-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <ShieldCheck size={24} className="mr-3 text-bellboy" />
+                <div>
+                  <h3 className="font-serif font-medium text-lg">Admin Dashboard</h3>
+                  <p className="text-sm text-muted-foreground">Access administrative controls and analytics</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate("/admin")} 
+                className="bg-bellboy hover:bg-bellboy/90"
+              >
+                <LayoutDashboard size={16} className="mr-2" />
+                Access
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Menu Items */}
         <div className="space-y-2">
