@@ -2,6 +2,7 @@
 import React from "react";
 import Header from "./Header";
 import BottomNav from "./BottomNav";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PageContainerProps {
   children: React.ReactNode;
@@ -16,10 +17,12 @@ const PageContainer: React.FC<PageContainerProps> = ({
   showBottomNav = true,
   className,
 }) => {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="flex flex-col min-h-screen bg-background relative">
       <Header showBackButton={showBackButton} />
-      <main className={`flex-1 container mx-auto px-4 py-6 pb-24 ${className}`}>
+      <main className={`flex-1 container mx-auto px-4 py-6 ${isMobile ? 'pb-24' : 'pb-16'} ${className}`}>
         <div className="max-w-4xl mx-auto">
           {children}
         </div>

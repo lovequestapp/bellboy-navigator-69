@@ -6,6 +6,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { getUpcomingHotels } from "@/services/hotelService";
 import { toast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ConciergeService {
   id: string;
@@ -23,6 +24,7 @@ const VirtualConcierge: React.FC = () => {
   const navigate = useNavigate();
   const upcomingStays = getUpcomingHotels();
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const isMobile = useIsMobile();
   
   // Mock data for concierge services
   const conciergeServices: ConciergeService[] = [
@@ -163,8 +165,8 @@ const VirtualConcierge: React.FC = () => {
                     key={service.id} 
                     className="relative bg-white rounded-lg overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
                   >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="md:w-1/3 h-48 md:h-auto relative">
+                    <div className={`flex flex-col ${isMobile ? "" : "md:flex-row"}`}>
+                      <div className={`${isMobile ? "w-full" : "md:w-1/3"} h-48 md:h-auto relative`}>
                         <img 
                           src={service.image} 
                           alt={service.title} 
@@ -174,7 +176,7 @@ const VirtualConcierge: React.FC = () => {
                           {service.price}
                         </div>
                       </div>
-                      <div className="p-4 md:w-2/3 flex flex-col justify-between">
+                      <div className={`p-4 ${isMobile ? "w-full" : "md:w-2/3"} flex flex-col justify-between`}>
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <div className="p-1.5 bg-bellboy-accent rounded-full text-bellboy">
@@ -185,20 +187,20 @@ const VirtualConcierge: React.FC = () => {
                           
                           <p className="text-muted-foreground mb-3">{service.description}</p>
                           
-                          <div className="flex items-center gap-4 text-sm">
+                          <div className={`${isMobile ? "flex flex-col gap-2" : "flex items-center gap-4"} text-sm`}>
                             <div className="flex items-center">
                               <Calendar size={14} className="mr-1 text-bellboy" />
                               <span>{service.date}</span>
                             </div>
                             <div className="flex items-center">
                               <Star size={14} className="mr-1 text-bellboy" />
-                              <span>{service.location}</span>
+                              <span className={isMobile ? "line-clamp-1" : ""}>{service.location}</span>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center mt-4">
-                          <div className="flex gap-2">
+                        <div className={`${isMobile ? "flex flex-col gap-3" : "flex justify-between items-center"} mt-4`}>
+                          <div className="flex flex-wrap gap-2">
                             {service.tags.map(tag => (
                               <span key={tag} className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs">
                                 {tag}

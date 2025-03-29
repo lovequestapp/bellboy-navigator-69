@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "./button";
 import { ArrowRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ServiceCardProps {
   service: {
@@ -14,6 +15,8 @@ interface ServiceCardProps {
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
+  const isMobile = useIsMobile();
+  
   const handleClick = (e: React.MouseEvent) => {
     onClick(service.id);
   };
@@ -33,9 +36,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
           {service.icon}
         </div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 pr-2">
         <h3 className="font-serif text-lg font-medium text-foreground">{service.name}</h3>
-        <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
+        <p className={`text-sm text-muted-foreground mt-1 ${isMobile ? 'line-clamp-2' : ''}`}>{service.description}</p>
       </div>
       <Button 
         variant="outline" 
@@ -43,7 +46,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
         size="sm"
         onClick={handleOrderClick}
       >
-        Order <ArrowRight className="ml-1 h-4 w-4" />
+        {isMobile ? <ArrowRight className="h-4 w-4" /> : <>Order <ArrowRight className="ml-1 h-4 w-4" /></>}
       </Button>
     </div>
   );
