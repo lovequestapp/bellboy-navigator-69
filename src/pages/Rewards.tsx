@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Heart, Gift, ArrowRight, Check, AlertCircle } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
@@ -142,7 +141,11 @@ const Rewards: React.FC = () => {
           </div>
           
           <p className="text-sm text-white/80 mb-2">Progress to next reward</p>
-          <Progress value={progressPercentage} className="h-2 mb-2 bg-white/20" indicatorClassName="bg-bellboy-gold" />
+          <Progress 
+            value={progressPercentage} 
+            className="h-2 mb-2 bg-white/20" 
+            indicatorClassName="bg-bellboy-gold" 
+          />
           <div className="flex justify-between text-xs text-white/80">
             <span>Current: {loyaltyPoints}</span>
             <span>Next reward: {nextRewardAt}</span>
