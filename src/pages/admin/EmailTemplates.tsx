@@ -219,13 +219,13 @@ const EmailTemplates = () => {
                     <div className="text-xs text-slate-500">
                       <p>Available variables:</p>
                       <ul className="list-disc list-inside mt-1">
-                        <li>{{"{{"}}firstName{{"}}"}}: Recipient's first name</li>
-                        <li>{{"{{"}}bookingId{{"}}"}}: Booking reference number</li>
-                        <li>{{"{{"}}hotelName{{"}}"}}: Hotel name</li>
-                        <li>{{"{{"}}checkInDate{{"}}"}}: Check-in date</li>
-                        <li>{{"{{"}}checkOutDate{{"}}"}}: Check-out date</li>
-                        <li>{{"{{"}}transactionId{{"}}"}}: Transaction reference</li>
-                        <li>{{"{{"}}amount{{"}}"}}: Transaction amount</li>
+                        <li>{"{{firstName}}"}: Recipient's first name</li>
+                        <li>{"{{bookingId}}"}: Booking reference number</li>
+                        <li>{"{{hotelName}}"}: Hotel name</li>
+                        <li>{"{{checkInDate}}"}: Check-in date</li>
+                        <li>{"{{checkOutDate}}"}: Check-out date</li>
+                        <li>{"{{transactionId}}"}: Transaction reference</li>
+                        <li>{"{{amount}}"}: Transaction amount</li>
                       </ul>
                     </div>
                   </div>
