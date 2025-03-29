@@ -9,6 +9,7 @@ import Hotels from "./pages/Hotels";
 import Services from "./pages/Services";
 import ServiceDetails from "./pages/ServiceDetails";
 import Explore from "./pages/Explore";
+import PlaceDetails from "./pages/PlaceDetails";
 import Rewards from "./pages/Rewards";
 import Profile from "./pages/Profile";
 import CheckIn from "./pages/CheckIn";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/services/:serviceId" element={<ServiceDetails />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/explore/:placeId" element={<PlaceDetails />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/check-in" element={<CheckIn />} />

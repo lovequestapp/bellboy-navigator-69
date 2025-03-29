@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, Search } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import ExploreCard from "@/components/ui/ExploreCard";
@@ -65,11 +66,40 @@ const places = {
 };
 
 const Explore: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("restaurants");
+  const [filteredPlaces, setFilteredPlaces] = useState(places);
+
+  // Filter places based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredPlaces(places);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = Object.fromEntries(
+      Object.entries(places).map(([category, categoryPlaces]) => [
+        category,
+        categoryPlaces.filter(
+          (place) =>
+            place.name.toLowerCase().includes(query) ||
+            place.category.toLowerCase().includes(query)
+        ),
+      ])
+    );
+
+    setFilteredPlaces(filtered);
+  }, [searchQuery]);
 
   const handlePlaceClick = (placeId: string) => {
     console.log("Place clicked:", placeId);
-    // Navigate to place detail page
+    navigate(`/explore/${placeId}`);
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
 
   return (
@@ -96,7 +126,7 @@ const Explore: React.FC = () => {
           </div>
         </div>
         
-        <Tabs defaultValue="restaurants">
+        <Tabs defaultValue="restaurants" value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger value="restaurants">Dining</TabsTrigger>
             <TabsTrigger value="attractions">Attractions</TabsTrigger>
@@ -105,35 +135,53 @@ const Explore: React.FC = () => {
           
           <TabsContent value="restaurants" className="space-y-4">
             <h2 className="text-xl font-serif font-semibold mb-4">Recommended Restaurants</h2>
-            {places.restaurants.map((place) => (
-              <ExploreCard
-                key={place.id}
-                place={place}
-                onClick={handlePlaceClick}
-              />
-            ))}
+            {filteredPlaces.restaurants.length > 0 ? (
+              filteredPlaces.restaurants.map((place) => (
+                <ExploreCard
+                  key={place.id}
+                  place={place}
+                  onClick={handlePlaceClick}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No restaurants matching your search.</p>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="attractions" className="space-y-4">
             <h2 className="text-xl font-serif font-semibold mb-4">Popular Attractions</h2>
-            {places.attractions.map((place) => (
-              <ExploreCard
-                key={place.id}
-                place={place}
-                onClick={handlePlaceClick}
-              />
-            ))}
+            {filteredPlaces.attractions.length > 0 ? (
+              filteredPlaces.attractions.map((place) => (
+                <ExploreCard
+                  key={place.id}
+                  place={place}
+                  onClick={handlePlaceClick}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No attractions matching your search.</p>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="shopping" className="space-y-4">
             <h2 className="text-xl font-serif font-semibold mb-4">Shopping Destinations</h2>
-            {places.shopping.map((place) => (
-              <ExploreCard
-                key={place.id}
-                place={place}
-                onClick={handlePlaceClick}
-              />
-            ))}
+            {filteredPlaces.shopping.length > 0 ? (
+              filteredPlaces.shopping.map((place) => (
+                <ExploreCard
+                  key={place.id}
+                  place={place}
+                  onClick={handlePlaceClick}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No shopping destinations matching your search.</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

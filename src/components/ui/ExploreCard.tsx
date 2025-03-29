@@ -16,10 +16,19 @@ interface ExploreCardProps {
 }
 
 const ExploreCard: React.FC<ExploreCardProps> = ({ place, onClick }) => {
+  const handleCardClick = () => {
+    onClick(place.id);
+  };
+
+  const handleViewDetailsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick(place.id);
+  };
+
   return (
     <div 
       className="bellboy-card mb-5 animate-fade-in cursor-pointer hover:shadow-lg transition-all duration-300"
-      onClick={() => onClick(place.id)}
+      onClick={handleCardClick}
     >
       <div className="relative h-44 mb-3 rounded-lg overflow-hidden">
         <img
@@ -43,7 +52,10 @@ const ExploreCard: React.FC<ExploreCardProps> = ({ place, onClick }) => {
       </div>
       
       <div className="mt-4">
-        <Button className="w-full bg-bellboy hover:bg-bellboy-light text-white">
+        <Button 
+          className="w-full bg-bellboy hover:bg-bellboy-light text-white"
+          onClick={handleViewDetailsClick}
+        >
           View Details
         </Button>
       </div>
