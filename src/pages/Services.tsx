@@ -1,7 +1,7 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Utensils, Bed, DoorOpen, Bell, Check, X } from "lucide-react";
+import { Utensils, Bed, DoorOpen, Bell, Check, X, Loader2 } from "lucide-react";
 import PageContainer from "@/components/layout/PageContainer";
 import ServiceCard from "@/components/ui/ServiceCard";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // Mock data
 const services = [
@@ -60,13 +64,55 @@ const deliveryTimes = [
   { id: "9:00", label: "9:00 AM" },
 ];
 
+// Form validation schema
+const coffeeFormSchema = z.object({
+  coffeeType: z.string({
+    required_error: "Please select a coffee type",
+  }),
+  deliveryTime: z.string({
+    required_error: "Please select a delivery time",
+  }),
+  specialInstructions: z.string().optional(),
+});
+
+type CoffeeFormValues = z.infer<typeof coffeeFormSchema>;
+
 const Services: React.FC = () => {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedCoffee, setSelectedCoffee] = useState("");
-  const [selectedTime, setSelectedTime] = useState("7:30");
-  const [specialInstructions, setSpecialInstructions] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isDailyDeliverySet, setIsDailyDeliverySet] = useState(false);
+  const [servicesLoading, setServicesLoading] = useState(true);
+
+  const form = useForm<CoffeeFormValues>({
+    resolver: zodResolver(coffeeFormSchema),
+    defaultValues: {
+      coffeeType: "",
+      deliveryTime: "7:30",
+      specialInstructions: "",
+    },
+  });
+
+  // Simulate loading services
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setServicesLoading(false);
+    }, 800);
+    
+    // Check if daily delivery is already set in localStorage
+    const savedDelivery = localStorage.getItem("dailyCoffeeDelivery");
+    if (savedDelivery) {
+      setIsDailyDeliverySet(true);
+      const deliveryData = JSON.parse(savedDelivery);
+      form.reset({
+        coffeeType: deliveryData.coffeeType,
+        deliveryTime: deliveryData.deliveryTime,
+        specialInstructions: deliveryData.specialInstructions || "",
+      });
+    }
+    
+    return () => clearTimeout(timer);
+  }, [form]);
 
   const handleServiceClick = (serviceId: string) => {
     console.log("Service clicked:", serviceId);
@@ -79,31 +125,32 @@ const Services: React.FC = () => {
 
   const handleCancelDelivery = () => {
     setIsDailyDeliverySet(false);
+    localStorage.removeItem("dailyCoffeeDelivery");
     toast({
       title: "Coffee Service Cancelled",
       description: "Your daily coffee service has been cancelled.",
     });
   };
 
-  const handleSetupDelivery = () => {
-    if (!selectedCoffee) {
+  const onSubmit = (values: CoffeeFormValues) => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const selectedCoffeeName = coffeeOptions.find(option => option.id === values.coffeeType)?.name || "Coffee";
+      
+      setIsDailyDeliverySet(true);
+      setIsDialogOpen(false);
+      setIsLoading(false);
+      
+      // Save to localStorage for persistence
+      localStorage.setItem("dailyCoffeeDelivery", JSON.stringify(values));
+      
       toast({
-        title: "Selection Required",
-        description: "Please select a coffee type to continue.",
-        variant: "destructive"
+        title: "Coffee Service Scheduled",
+        description: `Your daily ${selectedCoffeeName} will be delivered at ${deliveryTimes.find(time => time.id === values.deliveryTime)?.label || "7:30 AM"}.`,
       });
-      return;
-    }
-
-    const selectedCoffeeName = coffeeOptions.find(option => option.id === selectedCoffee)?.name || "Coffee";
-    
-    setIsDailyDeliverySet(true);
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Coffee Service Scheduled",
-      description: `Your daily ${selectedCoffeeName} will be delivered at ${deliveryTimes.find(time => time.id === selectedTime)?.label || "7:30 AM"}.`,
-    });
+    }, 1000);
   };
 
   return (
@@ -119,15 +166,22 @@ const Services: React.FC = () => {
         
         <h2 className="text-xl font-serif font-semibold mb-4">Available Services</h2>
         
-        <div className="space-y-4">
-          {services.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              onClick={handleServiceClick}
-            />
-          ))}
-        </div>
+        {servicesLoading ? (
+          <div className="py-10 flex flex-col items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-bellboy" />
+            <p className="mt-2 text-sm text-muted-foreground">Loading services...</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {services.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                onClick={handleServiceClick}
+              />
+            ))}
+          </div>
+        )}
         
         <div className="pt-6">
           <h2 className="text-xl font-serif font-semibold mb-4">Personalized Recommendations</h2>
@@ -164,7 +218,7 @@ const Services: React.FC = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] p-4 sm:p-6">
+        <DialogContent className="sm:max-w-[500px] p-4 sm:p-6 max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif">Configure Coffee Service</DialogTitle>
             <DialogDescription>
@@ -172,75 +226,110 @@ const Services: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4 space-y-5 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
-            <div className="space-y-3">
-              <h4 className="font-medium text-sm">Select Your Coffee</h4>
-              <RadioGroup
-                value={selectedCoffee}
-                onValueChange={setSelectedCoffee}
-                className="space-y-2"
-              >
-                {coffeeOptions.map((option) => (
-                  <div key={option.id} className="flex items-start space-x-2 p-3 rounded-md border hover:bg-muted transition-colors">
-                    <RadioGroupItem value={option.id} id={option.id} />
-                    <div className="flex-1 space-y-1">
-                      <Label htmlFor={option.id} className="font-medium">{option.name}</Label>
-                      <p className="text-xs text-muted-foreground">{option.description}</p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 overflow-y-auto py-4 flex-1">
+              <FormField
+                control={form.control}
+                name="coffeeType"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="font-medium text-sm">Select Your Coffee</FormLabel>
+                    <div className="space-y-2">
+                      {coffeeOptions.map((option) => (
+                        <div key={option.id} className="flex items-start space-x-2 p-3 rounded-md border hover:bg-muted transition-colors">
+                          <RadioGroupItem 
+                            value={option.id} 
+                            id={option.id} 
+                            checked={field.value === option.id}
+                            onCheckedChange={() => field.onChange(option.id)}
+                          />
+                          <div className="flex-1 space-y-1">
+                            <Label htmlFor={option.id} className="font-medium">{option.name}</Label>
+                            <p className="text-xs text-muted-foreground">{option.description}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-medium text-sm">Delivery Time</h4>
-              <RadioGroup
-                value={selectedTime}
-                onValueChange={setSelectedTime}
-                className="flex flex-wrap gap-2"
-              >
-                {deliveryTimes.map((time) => (
-                  <div key={time.id} className="flex items-center">
-                    <RadioGroupItem
-                      value={time.id}
-                      id={`time-${time.id}`}
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor={`time-${time.id}`}
-                      className="px-3 py-1.5 rounded-full border border-muted text-sm cursor-pointer peer-data-[state=checked]:bg-bellboy peer-data-[state=checked]:text-white peer-data-[state=checked]:border-bellboy"
-                    >
-                      {time.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="special-instructions" className="font-medium text-sm">Special Instructions (Optional)</Label>
-              <Input
-                id="special-instructions"
-                placeholder="Any special preferences or requests..."
-                value={specialInstructions}
-                onChange={(e) => setSpecialInstructions(e.target.value)}
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
+
+              <FormField
+                control={form.control}
+                name="deliveryTime"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="font-medium text-sm">Delivery Time</FormLabel>
+                    <div className="flex flex-wrap gap-2">
+                      {deliveryTimes.map((time) => (
+                        <div key={time.id} className="flex items-center">
+                          <FormControl>
+                            <input
+                              type="radio"
+                              id={`time-${time.id}`}
+                              value={time.id}
+                              checked={field.value === time.id}
+                              onChange={() => field.onChange(time.id)}
+                              className="peer sr-only"
+                            />
+                          </FormControl>
+                          <Label
+                            htmlFor={`time-${time.id}`}
+                            className="px-3 py-1.5 rounded-full border border-muted text-sm cursor-pointer peer-checked:bg-bellboy peer-checked:text-white peer-checked:border-bellboy"
+                          >
+                            {time.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="specialInstructions"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel htmlFor="special-instructions" className="font-medium text-sm">Special Instructions (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="special-instructions"
+                        placeholder="Any special preferences or requests..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
           
-          <DialogFooter className="mt-2">
+          <DialogFooter className="mt-2 pt-2 border-t">
             <Button 
               variant="outline" 
               onClick={() => setIsDialogOpen(false)}
               className="border-bellboy text-bellboy hover:bg-bellboy/10"
+              disabled={isLoading}
             >
               Cancel
             </Button>
             <Button 
               className="bg-bellboy hover:bg-bellboy-light"
-              onClick={handleSetupDelivery}
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={isLoading}
             >
-              Confirm Daily Delivery
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm Daily Delivery"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,6 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 import Index from "./pages/Index";
 import Hotels from "./pages/Hotels";
 import Services from "./pages/Services";
@@ -21,36 +23,73 @@ import { PreferencesProvider } from "./contexts/PreferencesContext";
 // Set default accent color for luxury aesthetics
 document.documentElement.style.setProperty("--bellboy-color", "#0F3460");
 
-const queryClient = new QueryClient();
+// Configure React Query with error handling and retry logic
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <PreferencesProvider>
-          <TooltipProvider>
-            <div className="bg-gradient-to-tr from-background to-background/95 min-h-screen">
-              <Toaster />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/landing" element={<Landing />} />
-                <Route path="/hotels" element={<Hotels />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/services/:serviceId" element={<ServiceDetails />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/explore/:placeId" element={<PlaceDetails />} />
-                <Route path="/rewards" element={<Rewards />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/check-in" element={<CheckIn />} />
-                <Route path="/concierge" element={<VirtualConcierge />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </TooltipProvider>
-        </PreferencesProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Monitor and handle offline/online status
+  useEffect(() => {
+    const handleOnline = () => {
+      toast({
+        title: "You're back online",
+        description: "Your connection has been restored.",
+      });
+    };
+
+    const handleOffline = () => {
+      toast({
+        title: "You're offline",
+        description: "Some features may be limited until connection is restored.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <PreferencesProvider>
+            <TooltipProvider>
+              <div className="bg-gradient-to-tr from-background to-background/95 min-h-screen">
+                <Toaster />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/landing" element={<Landing />} />
+                  <Route path="/hotels" element={<Hotels />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/services/:serviceId" element={<ServiceDetails />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/explore/:placeId" element={<PlaceDetails />} />
+                  <Route path="/rewards" element={<Rewards />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/check-in" element={<CheckIn />} />
+                  <Route path="/concierge" element={<VirtualConcierge />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </TooltipProvider>
+          </PreferencesProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
