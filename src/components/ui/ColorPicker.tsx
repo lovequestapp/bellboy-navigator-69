@@ -22,13 +22,17 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
 }) => {
   const colorOptions: ColorOption[] = [
     { name: "Navy", value: "#0F1E54", textColor: "text-white" },
-    { name: "Royal Blue", value: "#2A3F7E", textColor: "text-white" },
-    { name: "Gold", value: "#D4AF37", textColor: "text-black" },
-    { name: "Silver", value: "#C0C0C0", textColor: "text-black" },
+    { name: "Royal Blue", value: "#1A365D", textColor: "text-white" },
+    { name: "Gold", value: "#B7922A", textColor: "text-black" },
     { name: "Burgundy", value: "#800020", textColor: "text-white" },
-    { name: "Forest", value: "#228B22", textColor: "text-white" },
-    { name: "Purple", value: "#4B0082", textColor: "text-white" },
-    { name: "Teal", value: "#008080", textColor: "text-white" },
+    { name: "Charcoal", value: "#333333", textColor: "text-white" },
+    { name: "Emerald", value: "#046307", textColor: "text-white" },
+    { name: "Plum", value: "#5B2C60", textColor: "text-white" },
+    { name: "Teal", value: "#005E63", textColor: "text-white" },
+    { name: "Slate", value: "#404E5C", textColor: "text-white" },
+    { name: "Amber", value: "#FF8C00", textColor: "text-black" },
+    { name: "Crimson", value: "#DC143C", textColor: "text-white" },
+    { name: "Forest", value: "#0B5345", textColor: "text-white" },
   ];
 
   return (
@@ -41,7 +45,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
               "w-full aspect-square rounded-md flex items-center justify-center relative transition-all",
               selectedColor === color.value
                 ? "ring-2 ring-black dark:ring-white ring-offset-2"
-                : "hover:scale-105"
+                : "hover:scale-105 hover:shadow-lg"
             )}
             style={{ backgroundColor: color.value }}
             onClick={() => onChange(color.value)}

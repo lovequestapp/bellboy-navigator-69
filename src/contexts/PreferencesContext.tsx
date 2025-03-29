@@ -8,15 +8,15 @@ interface Preferences {
   darkMode: boolean;
   accentColor: string;
   language: string;
-  reduceAnimations?: boolean;
-  highContrast?: boolean;
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  marketingEmails?: boolean;
-  dataCollection?: boolean;
-  dateFormat?: string;
-  timeFormat?: string;
-  currency?: string;
+  reduceAnimations: boolean;
+  highContrast: boolean;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  marketingEmails: boolean;
+  dataCollection: boolean;
+  dateFormat: string;
+  timeFormat: string;
+  currency: string;
 }
 
 interface PreferencesContextType {
@@ -27,7 +27,7 @@ interface PreferencesContextType {
 const defaultPreferences: Preferences = {
   notifications: true,
   darkMode: localStorage.getItem("theme") === "dark",
-  accentColor: localStorage.getItem("accentColor") || "#0F1E54", // Navy blue default
+  accentColor: localStorage.getItem("accentColor") || "#1A365D", // Deeper blue default
   language: "english",
   reduceAnimations: false,
   highContrast: false,

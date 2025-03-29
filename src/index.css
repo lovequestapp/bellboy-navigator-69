@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -37,7 +37,7 @@
 
     --radius: 0.5rem;
 
-    --bellboy-color: #0F1E54;
+    --bellboy-color: #1A365D;
   }
 
   .dark {
@@ -78,34 +78,56 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
   .bellboy-card {
-    @apply bg-white rounded-lg shadow-md p-6 border border-border hover:shadow-lg transition-shadow duration-300;
+    @apply bg-white/80 backdrop-blur-sm rounded-lg shadow-md p-6 border border-border/40 hover:shadow-lg transition-all duration-300;
   }
   
   .bellboy-button-primary {
-    @apply bg-bellboy text-white font-medium px-4 py-2 rounded-md hover:bg-bellboy-light transition-colors;
+    @apply bg-bellboy text-white font-medium px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors shadow-sm;
   }
   
   .bellboy-button-secondary {
-    @apply bg-bellboy-accent text-bellboy font-medium px-4 py-2 rounded-md hover:bg-opacity-80 transition-colors;
+    @apply bg-bellboy-accent/80 text-bellboy font-medium px-4 py-2 rounded-md hover:bg-opacity-95 transition-colors shadow-sm;
   }
   
   .bellboy-input {
-    @apply border border-input rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring;
+    @apply border border-input rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring shadow-sm;
+  }
+
+  .luxury-gradient {
+    @apply bg-gradient-to-br from-bellboy to-bellboy-dark;
+  }
+
+  .luxury-card {
+    @apply bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6 hover:shadow-xl transition-all duration-300;
+  }
+
+  .premium-text {
+    @apply font-medium tracking-tight;
+  }
+
+  .premium-heading {
+    @apply font-serif font-semibold tracking-tight;
   }
 }
 
 /* Dark mode support for cards */
 .dark .bellboy-card {
-  @apply bg-card border-border;
+  @apply bg-card/90 backdrop-blur-sm border-border/40;
+}
+
+.dark .luxury-card {
+  @apply bg-card/90 backdrop-blur-sm border-border/30;
 }
 
 /* Dynamic accent color support */
@@ -120,4 +142,62 @@
 .hover\:bg-bellboy:hover {
   background-color: var(--bellboy-color) !important;
   opacity: 0.9;
+}
+
+/* Premium UI elements */
+.premium-shadow {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-card {
+  background: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Subtle animations */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Typographic improvements */
+.premium-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Advanced buttons */
+.btn-premium {
+  @apply px-6 py-3 font-medium rounded-md shadow-sm transition-all duration-300;
+  letter-spacing: 0.01em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
+}
+
+.btn-premium:hover::after {
+  width: 100%;
 }
