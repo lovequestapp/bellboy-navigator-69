@@ -87,11 +87,12 @@ const UserEngagement = () => {
     }
   };
 
-  const formatYAxis = (value: number) => {
+  // Updated to always return a string
+  const formatYAxis = (value: number): string => {
     if (metric === "avgDuration") {
       return `${value} min`;
     }
-    return value >= 1000 ? `${value / 1000}k` : value;
+    return value >= 1000 ? `${value / 1000}k` : `${value}`;
   };
 
   const formatTooltip = (value: number) => {
