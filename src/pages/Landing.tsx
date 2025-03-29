@@ -513,7 +513,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-white/20 mt-12 pt-8 text-center text-sm">
-            <p>&copy; 2023 BellBoy Technologies. All rights reserved.</p>
+            <p>&copy; 2025 BellBoy Technologies. All rights reserved.</p>
           </div>
         </div>
       </footer>
