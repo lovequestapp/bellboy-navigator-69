@@ -16,14 +16,14 @@ export interface Hotel {
   status?: "upcoming" | "active" | "past";
 }
 
-// Mock data for hotels
+// Mock data for hotels with dates relevant to 2025
 const upcomingHotels: Hotel[] = [
   {
     id: "1",
     name: "Grand Majestic Hotel",
     location: "New York, NY",
-    checkIn: "Oct 15, 2023",
-    checkOut: "Oct 20, 2023",
+    checkIn: "Apr 15, 2025",
+    checkOut: "Apr 20, 2025",
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Experience luxury in the heart of Manhattan with stunning city views and world-class amenities.",
     amenities: ["Free Wi-Fi", "Pool", "Spa", "Fitness Center", "Restaurant"],
@@ -36,8 +36,8 @@ const upcomingHotels: Hotel[] = [
     id: "2",
     name: "Seaside Resort & Spa",
     location: "Miami, FL",
-    checkIn: "Dec 23, 2023",
-    checkOut: "Dec 30, 2023",
+    checkIn: "Jun 23, 2025",
+    checkOut: "Jun 30, 2025",
     image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Beachfront paradise with private balconies and exceptional ocean views.",
     amenities: ["Beach Access", "Spa", "Pool", "Free Breakfast", "Water Sports"],
@@ -50,8 +50,8 @@ const upcomingHotels: Hotel[] = [
     id: "3",
     name: "Urban Boutique Hotel",
     location: "Chicago, IL",
-    checkIn: "Nov 10, 2023",
-    checkOut: "Nov 15, 2023",
+    checkIn: "May 10, 2025",
+    checkOut: "May 15, 2025",
     image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Stylish urban retreat with designer interiors and personalized service.",
     amenities: ["Free Wi-Fi", "Lounge", "Bike Rental", "Restaurant", "Concierge"],
@@ -67,8 +67,8 @@ const pastHotels: Hotel[] = [
     id: "4",
     name: "Mountain View Lodge",
     location: "Aspen, CO",
-    checkIn: "Jan 5, 2023",
-    checkOut: "Jan 10, 2023",
+    checkIn: "Jan 5, 2025",
+    checkOut: "Jan 10, 2025",
     image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Rustic elegance with breathtaking mountain views and ski-in/ski-out access.",
     amenities: ["Fireplace", "Hot Tub", "Ski Storage", "Shuttle", "Restaurant"],
@@ -81,8 +81,8 @@ const pastHotels: Hotel[] = [
     id: "5",
     name: "Riverside Inn",
     location: "Portland, OR",
-    checkIn: "Mar 15, 2023",
-    checkOut: "Mar 18, 2023",
+    checkIn: "Feb 15, 2025",
+    checkOut: "Feb 18, 2025",
     image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Charming property nestled along the scenic river with farm-to-table dining.",
     amenities: ["River Views", "Organic Breakfast", "Kayaking", "Garden", "Bicycles"],

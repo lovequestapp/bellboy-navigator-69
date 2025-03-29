@@ -18,6 +18,9 @@ const CheckIn: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // Current date for defaults
+  const currentDate = new Date(2025, 2, 29); // March 29, 2025
+  
   const [hotelName, setHotelName] = useState("");
   const [hotelLocation, setHotelLocation] = useState("");
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(undefined);
@@ -176,7 +179,9 @@ const CheckIn: React.FC = () => {
                         selected={checkInDate}
                         onSelect={handleCheckInSelect}
                         initialFocus
-                        disabled={(date) => date < new Date()}
+                        disabled={(date) => date < currentDate}
+                        defaultMonth={currentDate}
+                        className="pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
@@ -206,8 +211,10 @@ const CheckIn: React.FC = () => {
                         initialFocus
                         disabled={(date) => 
                           (checkInDate ? date <= checkInDate : false) || 
-                          date < new Date()
+                          date < currentDate
                         }
+                        defaultMonth={currentDate}
+                        className="pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>

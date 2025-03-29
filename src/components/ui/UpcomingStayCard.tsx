@@ -15,9 +15,9 @@ const UpcomingStayCard: React.FC<UpcomingStayCardProps> = ({ hotel }) => {
   const daysUntilCheckIn = () => {
     const today = new Date();
     const checkInParts = hotel.checkIn.split(' ');
-    const month = new Date(Date.parse(`${checkInParts[0]} 1, 2023`)).getMonth();
+    const month = new Date(Date.parse(`${checkInParts[0]} 1, ${checkInParts[2] || '2025'}`)).getMonth();
     const day = parseInt(checkInParts[1].replace(',', ''));
-    const year = parseInt(checkInParts[2]);
+    const year = parseInt(checkInParts[2] || '2025');
     
     const checkInDate = new Date(year, month, day);
     const timeDiff = checkInDate.getTime() - today.getTime();
