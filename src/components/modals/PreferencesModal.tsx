@@ -93,8 +93,8 @@ const PreferencesModal: React.FC<PreferencesModalProps> = ({
               <div className="space-y-3">
                 <Label className="font-medium">Accent Color</Label>
                 <ColorPicker
-                  currentColor={preferences.accentColor || "#0F1E54"}
-                  onColorChange={handleColorChange}
+                  selectedColor={preferences.accentColor || "#0F1E54"}
+                  onChange={handleColorChange}
                 />
               </div>
 
