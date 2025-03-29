@@ -12,6 +12,7 @@ import Rewards from "./pages/Rewards";
 import Profile from "./pages/Profile";
 import CheckIn from "./pages/CheckIn";
 import NotFound from "./pages/NotFound";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/services" element={<Services />} />
           <Route path="/explore" element={<Explore />} />

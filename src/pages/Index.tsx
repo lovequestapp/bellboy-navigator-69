@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Bed, MapPin, Heart, Calendar } from "lucide-react";
+import { Bell, Bed, MapPin, Heart, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
@@ -27,6 +27,13 @@ const Index = () => {
               onClick={() => navigate("/hotels")}
             >
               Get Started
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full py-6 border-bellboy text-bellboy hover:bg-bellboy/5"
+              onClick={() => navigate("/landing")}
+            >
+              Learn More <ArrowRight className="ml-2" />
             </Button>
           </div>
         </section>
