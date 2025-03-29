@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   BarChart, 
   Bar, 
@@ -11,7 +11,77 @@ import {
   ResponsiveContainer 
 } from "recharts";
 
-const data = [
+interface BookingMetricsProps {
+  timeframe?: "daily" | "weekly" | "monthly";
+}
+
+const dailyData = [
+  {
+    name: "Direct",
+    completed: 84,
+    abandoned: 12,
+    conversionRate: 87.5
+  },
+  {
+    name: "Mobile App",
+    completed: 120,
+    abandoned: 15,
+    conversionRate: 88.9
+  },
+  {
+    name: "Partners",
+    completed: 65,
+    abandoned: 25,
+    conversionRate: 72.2
+  },
+  {
+    name: "Social",
+    completed: 40,
+    abandoned: 15,
+    conversionRate: 72.7
+  },
+  {
+    name: "SEO",
+    completed: 35,
+    abandoned: 8,
+    conversionRate: 81.4
+  }
+];
+
+const weeklyData = [
+  {
+    name: "Direct",
+    completed: 210,
+    abandoned: 32,
+    conversionRate: 86.8
+  },
+  {
+    name: "Mobile App",
+    completed: 340,
+    abandoned: 45,
+    conversionRate: 88.3
+  },
+  {
+    name: "Partners",
+    completed: 190,
+    abandoned: 50,
+    conversionRate: 79.2
+  },
+  {
+    name: "Social",
+    completed: 120,
+    abandoned: 40,
+    conversionRate: 75.0
+  },
+  {
+    name: "SEO",
+    completed: 100,
+    abandoned: 20,
+    conversionRate: 83.3
+  }
+];
+
+const monthlyData = [
   {
     name: "Direct",
     completed: 340,
@@ -44,12 +114,24 @@ const data = [
   }
 ];
 
-const BookingMetrics = () => {
-  const [activeMetric, setActiveMetric] = React.useState<"bookings" | "conversion">("bookings");
+const BookingMetrics: React.FC<BookingMetricsProps> = ({ timeframe = "monthly" }) => {
+  const [activeMetric, setActiveMetric] = useState<"bookings" | "conversion">("bookings");
+
+  const getChartData = () => {
+    switch (timeframe) {
+      case "daily":
+        return dailyData;
+      case "weekly":
+        return weeklyData;
+      case "monthly":
+      default:
+        return monthlyData;
+    }
+  };
 
   return (
     <div className="space-y-4">
-      <div className="flex space-x-4">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setActiveMetric("bookings")}
           className={`px-4 py-2 text-sm rounded-full ${
@@ -76,7 +158,7 @@ const BookingMetrics = () => {
         <ResponsiveContainer width="100%" height="100%">
           {activeMetric === "bookings" ? (
             <BarChart
-              data={data}
+              data={getChartData()}
               margin={{
                 top: 20,
                 right: 30,
@@ -87,14 +169,17 @@ const BookingMetrics = () => {
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip />
+              <Tooltip 
+                formatter={(value) => [value, value === "abandoned" ? "Abandoned Bookings" : "Completed Bookings"]}
+                labelFormatter={(label) => `Channel: ${label}`}
+              />
               <Legend />
               <Bar name="Completed Bookings" dataKey="completed" stackId="a" fill="#0F3460" />
               <Bar name="Abandoned Bookings" dataKey="abandoned" stackId="a" fill="#E94560" />
             </BarChart>
           ) : (
             <BarChart
-              data={data}
+              data={getChartData()}
               margin={{
                 top: 20,
                 right: 30,
@@ -105,7 +190,10 @@ const BookingMetrics = () => {
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis dataKey="name" />
               <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
-              <Tooltip formatter={(value) => [`${value}%`, 'Conversion Rate']} />
+              <Tooltip 
+                formatter={(value) => [`${value}%`, 'Conversion Rate']}
+                labelFormatter={(label) => `Channel: ${label}`}
+              />
               <Bar name="Conversion Rate" dataKey="conversionRate" fill="#4CAF50" />
             </BarChart>
           )}

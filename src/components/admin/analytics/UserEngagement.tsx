@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   LineChart, 
   Line, 
@@ -17,6 +17,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+
+interface UserEngagementProps {
+  timeframe?: "daily" | "weekly" | "monthly";
+}
 
 const dailyData = [
   { date: "Mar 22", pageViews: 1400, sessions: 240, avgDuration: 3.2 },
@@ -44,22 +48,24 @@ const monthlyData = [
   { date: "Mar 2025", pageViews: 42000, sessions: 6700, avgDuration: 3.7 },
 ];
 
-const UserEngagement = () => {
-  const [timeframe, setTimeframe] = React.useState("daily");
-  const [metric, setMetric] = React.useState("pageViews");
+const UserEngagement: React.FC<UserEngagementProps> = ({ timeframe = "monthly" }) => {
+  const [metric, setMetric] = useState<"pageViews" | "sessions" | "avgDuration">("pageViews");
+  const [chartData, setChartData] = useState(monthlyData);
 
-  const getDataByTimeframe = () => {
+  useEffect(() => {
     switch (timeframe) {
       case "daily":
-        return dailyData;
+        setChartData(dailyData);
+        break;
       case "weekly":
-        return weeklyData;
+        setChartData(weeklyData);
+        break;
       case "monthly":
-        return monthlyData;
       default:
-        return dailyData;
+        setChartData(monthlyData);
+        break;
     }
-  };
+  }, [timeframe]);
 
   const getMetricName = () => {
     switch (metric) {
@@ -107,7 +113,7 @@ const UserEngagement = () => {
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <div className="flex space-x-2 items-center">
           <span className="text-sm text-gray-500">Metric:</span>
-          <Select value={metric} onValueChange={setMetric}>
+          <Select value={metric} onValueChange={(value) => setMetric(value as any)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select Metric" />
             </SelectTrigger>
@@ -118,26 +124,12 @@ const UserEngagement = () => {
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="flex space-x-2 items-center">
-          <span className="text-sm text-gray-500">Timeframe:</span>
-          <Select value={timeframe} onValueChange={setTimeframe}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Select Timeframe" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={getDataByTimeframe()}
+            data={chartData}
             margin={{
               top: 20,
               right: 30,
@@ -152,6 +144,7 @@ const UserEngagement = () => {
             />
             <Tooltip 
               formatter={(value: number) => formatTooltip(value)}
+              labelFormatter={(label) => `${timeframe === "daily" ? "Day" : timeframe === "weekly" ? "Week" : "Month"}: ${label}`}
             />
             <Legend />
             <Line

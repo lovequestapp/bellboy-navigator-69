@@ -1,13 +1,16 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Users, Settings, Hotel, Tag, MapPin, BarChart, 
-  Link, Palette, Mail, ToggleRight, MessageSquare, Activity, Layers, LogOut
+  Link, Palette, Mail, ToggleRight, MessageSquare, Activity, Layers, LogOut,
+  Menu, X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
 
 interface AdminLayoutProps {
@@ -58,7 +61,9 @@ const sidebarItems = [
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Admin access check
   React.useEffect(() => {
@@ -66,6 +71,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
       navigate("/profile");
     }
   }, [isAuthenticated, user, navigate]);
+
+  // If path not explicitly passed, get it from the location
+  const activePath = currentPage || location.pathname;
 
   const handleExitAdmin = () => {
     toast({
@@ -81,7 +89,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <div className="w-64 bg-slate-900 text-white p-4 hidden md:block overflow-y-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -108,7 +116,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
                 onClick={() => navigate(item.path)}
                 className={cn(
                   "flex items-center w-full text-left px-3 py-2 rounded-md text-sm mb-1 transition-colors",
-                  item.path === currentPage
+                  item.path === activePath || (item.path === "/admin" && activePath === "/admin")
                     ? "bg-slate-800 text-white font-medium"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 )}
@@ -122,32 +130,84 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = "" })
         ))}
       </div>
 
-      {/* Mobile nav - shown on small screens */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 text-white z-50">
-        <div className="flex justify-around p-2">
-          {sidebarItems.slice(0, 3).map((group, index) => (
-            <button
-              key={index}
-              onClick={() => navigate(group.items[0].path)}
-              className="flex flex-col items-center justify-center py-1 px-3"
-            >
-              {group.items[0].icon}
-              <span className="text-xs mt-1">{group.group}</span>
-            </button>
-          ))}
-          <button
-            onClick={handleExitAdmin}
-            className="flex flex-col items-center justify-center py-1 px-3"
-          >
-            <LogOut size={20} />
-            <span className="text-xs mt-1">Exit</span>
-          </button>
-        </div>
+      {/* Mobile menu button */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon" className="bg-slate-800 text-white border-slate-700">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="bg-slate-900 text-white p-0 border-slate-800 w-64">
+            <div className="p-4 h-full overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">BellBoy Admin</h2>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              <div className="mb-6">
+                <p className="text-sm text-slate-400">Welcome, {user.name}</p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleExitAdmin}
+                  className="mt-2 w-full text-slate-300 border-slate-700 hover:bg-slate-800"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Exit Admin Dashboard
+                </Button>
+              </div>
+              
+              {sidebarItems.map((group, index) => (
+                <div key={index} className="mb-6">
+                  <h3 className="text-sm font-semibold text-slate-400 mb-2">{group.group}</h3>
+                  {group.items.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        navigate(item.path);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={cn(
+                        "flex items-center w-full text-left px-3 py-2 rounded-md text-sm mb-1 transition-colors",
+                        item.path === activePath || (item.path === "/admin" && activePath === "/admin")
+                          ? "bg-slate-800 text-white font-medium"
+                          : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      )}
+                    >
+                      {item.icon}
+                      {item.name}
+                    </button>
+                  ))}
+                  {index < sidebarItems.length - 1 && <Separator className="my-3 bg-slate-800" />}
+                </div>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
+
+      {/* Floating exit button for mobile (in addition to menu exit) */}
+      <Button 
+        variant="outline" 
+        size="icon" 
+        onClick={handleExitAdmin}
+        className="md:hidden fixed top-4 right-4 z-50 bg-slate-800 text-white border-slate-700"
+        title="Exit Admin Dashboard"
+      >
+        <LogOut className="h-5 w-5" />
+      </Button>
 
       {/* Main content */}
       <div className="flex-1 bg-slate-100 overflow-y-auto pb-16 md:pb-0">
-        <div className="container px-4 py-6 mx-auto">
+        <div className="container px-4 py-6 mx-auto mt-12 md:mt-0">
           {children}
         </div>
       </div>
