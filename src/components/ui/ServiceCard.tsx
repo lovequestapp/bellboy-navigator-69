@@ -42,7 +42,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
       </div>
       <Button 
         variant="outline" 
-        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy group-hover:shadow-md"
+        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy group-hover:text-white"
         size="sm"
         onClick={handleOrderClick}
       >
