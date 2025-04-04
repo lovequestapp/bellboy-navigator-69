@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Bed, MapPin, Heart, Calendar, ArrowRight } from "lucide-react";
+import { Bell, Bed, MapPin, Heart, Calendar, DoorOpen, MessageSquare, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getUpcomingHotels } from "@/services/hotelService";
 import UpcomingStayCard from "@/components/ui/UpcomingStayCard";
@@ -38,7 +38,7 @@ const Index = () => {
           
           <div className="mt-6 space-y-4">
             <Button 
-              className="w-full py-6 bg-bellboy hover:bg-bellboy-light"
+              className="w-full py-6 bg-bellboy hover:bg-bellboy-light text-white"
               onClick={() => navigate("/hotels")}
             >
               {upcomingHotels.length > 0 ? "Manage Your Stays" : "Get Started"}
@@ -57,7 +57,7 @@ const Index = () => {
           <h2 className="text-xl font-serif font-semibold mb-4">Key Features</h2>
           <div className="grid grid-cols-2 gap-4">
             <div 
-              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => handleFeatureClick("/hotels")}
             >
               <Bed size={32} className="text-bellboy mb-2" />
@@ -65,7 +65,7 @@ const Index = () => {
               <p className="text-xs text-muted-foreground mt-1">Easy check-in and room access</p>
             </div>
             <div 
-              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => handleFeatureClick("/services")}
             >
               <Bell size={32} className="text-bellboy mb-2" />
@@ -73,7 +73,7 @@ const Index = () => {
               <p className="text-xs text-muted-foreground mt-1">Pre-order meals and services</p>
             </div>
             <div 
-              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => handleFeatureClick("/explore")}
             >
               <MapPin size={32} className="text-bellboy mb-2" />
@@ -81,12 +81,28 @@ const Index = () => {
               <p className="text-xs text-muted-foreground mt-1">Discover local attractions</p>
             </div>
             <div 
-              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer"
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => handleFeatureClick("/rewards")}
             >
               <Heart size={32} className="text-bellboy mb-2" />
               <h3 className="font-medium">Loyalty Rewards</h3>
               <p className="text-xs text-muted-foreground mt-1">Earn points with every stay</p>
+            </div>
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => handleFeatureClick("/smart-room")}
+            >
+              <DoorOpen size={32} className="text-bellboy mb-2" />
+              <h3 className="font-medium">Smart Room</h3>
+              <p className="text-xs text-muted-foreground mt-1">Control room features remotely</p>
+            </div>
+            <div 
+              className="bellboy-card flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => handleFeatureClick("/feedback")}
+            >
+              <MessageSquare size={32} className="text-bellboy mb-2" />
+              <h3 className="font-medium">Feedback</h3>
+              <p className="text-xs text-muted-foreground mt-1">Share your experience</p>
             </div>
           </div>
         </section>
@@ -107,7 +123,7 @@ const Index = () => {
       </main>
       
       <footer className="p-6 text-center text-sm text-muted-foreground">
-        <p>&copy; 2023 BellBoy. All rights reserved.</p>
+        <p>&copy; 2025 BellBoy. All rights reserved.</p>
       </footer>
     </div>
   );

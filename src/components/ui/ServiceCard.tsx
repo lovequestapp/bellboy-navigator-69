@@ -37,12 +37,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) => {
         </div>
       </div>
       <div className="flex-1 pr-2">
-        <h3 className="font-serif text-lg font-medium text-foreground">{service.name}</h3>
+        <h3 className="font-serif text-lg font-medium text-foreground group-hover:text-bellboy transition-colors duration-300">{service.name}</h3>
         <p className={`text-sm text-muted-foreground mt-1 ${isMobile ? 'line-clamp-2' : ''}`}>{service.description}</p>
       </div>
       <Button 
         variant="outline" 
-        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy group-hover:text-white"
+        className="bellboy-button-primary bg-transparent border-bellboy hover:bg-bellboy hover:text-white text-bellboy text-sm rounded-full group-hover:bg-bellboy group-hover:text-white transition-all duration-300"
         size="sm"
         onClick={handleOrderClick}
       >

@@ -17,6 +17,8 @@ import CheckIn from "./pages/CheckIn";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import VirtualConcierge from "./pages/VirtualConcierge";
+import SmartRoom from "./pages/SmartRoom";
+import Feedback from "./pages/Feedback";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
@@ -96,6 +98,8 @@ const App = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/check-in" element={<CheckIn />} />
                   <Route path="/concierge" element={<VirtualConcierge />} />
+                  <Route path="/smart-room" element={<SmartRoom />} />
+                  <Route path="/feedback" element={<Feedback />} />
 
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminDashboard />} />
