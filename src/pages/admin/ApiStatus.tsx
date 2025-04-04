@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,27 +7,87 @@ import { RefreshCw, CheckCircle, AlertCircle, AlertTriangle } from "lucide-react
 import { toast } from "@/hooks/use-toast";
 
 const ApiStatus = () => {
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
-  
-  const apiServices = [
-    { id: 1, name: "Hotel Booking API", status: "operational", latency: "45ms", lastChecked: "2 minutes ago" },
-    { id: 2, name: "Payment Gateway", status: "operational", latency: "120ms", lastChecked: "5 minutes ago" },
-    { id: 3, name: "User Authentication", status: "operational", latency: "65ms", lastChecked: "3 minutes ago" },
-    { id: 4, name: "Weather Service", status: "degraded", latency: "350ms", lastChecked: "10 minutes ago" },
-    { id: 5, name: "Email Service", status: "operational", latency: "90ms", lastChecked: "7 minutes ago" },
-    { id: 6, name: "SMS Notifications", status: "operational", latency: "110ms", lastChecked: "8 minutes ago" },
-    { id: 7, name: "Maps Integration", status: "down", latency: "—", lastChecked: "15 minutes ago" },
-  ];
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(new Date());
+  const [apiServices, setApiServices] = useState([
+    { id: 1, name: "Hotel Booking API", status: "operational", latency: "45ms", lastChecked: "Just now" },
+    { id: 2, name: "Payment Gateway", status: "operational", latency: "120ms", lastChecked: "Just now" },
+    { id: 3, name: "User Authentication", status: "operational", latency: "65ms", lastChecked: "Just now" },
+    { id: 4, name: "Weather Service", status: "degraded", latency: "350ms", lastChecked: "Just now" },
+    { id: 5, name: "Email Service", status: "operational", latency: "90ms", lastChecked: "Just now" },
+    { id: 6, name: "SMS Notifications", status: "operational", latency: "110ms", lastChecked: "Just now" },
+    { id: 7, name: "Maps Integration", status: "down", latency: "—", lastChecked: "Just now" },
+  ]);
+
+  useEffect(() => {
+    // Update the "lastChecked" for all services
+    const updateLastChecked = () => {
+      const now = new Date();
+      const timeElapsed = Math.floor((now.getTime() - lastRefreshed.getTime()) / 60000); // minutes
+      
+      setApiServices(prev => prev.map(service => ({
+        ...service,
+        lastChecked: timeElapsed === 0 ? "Just now" : `${timeElapsed} minute${timeElapsed !== 1 ? 's' : ''} ago`
+      })));
+    };
+    
+    // Update every minute
+    const interval = setInterval(updateLastChecked, 60000);
+    
+    // Initial update
+    updateLastChecked();
+    
+    return () => clearInterval(interval);
+  }, [lastRefreshed]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     
-    // Simulate API check
+    // Simulate API check with randomized status changes
     setTimeout(() => {
+      const updatedServices = apiServices.map(service => {
+        // Randomly change some service statuses for demonstration
+        const rand = Math.random();
+        let newStatus = service.status;
+        let newLatency = service.latency;
+        
+        if (rand < 0.2) {
+          // 20% chance to change status
+          if (service.status === "operational") {
+            newStatus = Math.random() > 0.5 ? "degraded" : "operational";
+            newLatency = newStatus === "degraded" ? `${Math.floor(Math.random() * 200) + 200}ms` : `${Math.floor(Math.random() * 100) + 40}ms`;
+          } else if (service.status === "degraded") {
+            newStatus = Math.random() > 0.5 ? "operational" : "down";
+            newLatency = newStatus === "operational" ? `${Math.floor(Math.random() * 100) + 40}ms` : "—";
+          } else if (service.status === "down") {
+            newStatus = Math.random() > 0.7 ? "degraded" : "down";
+            newLatency = newStatus === "degraded" ? `${Math.floor(Math.random() * 200) + 200}ms` : "—";
+          }
+        } else if (service.status === "operational") {
+          // If operational, still update the latency
+          newLatency = `${Math.floor(Math.random() * 100) + 40}ms`;
+        }
+        
+        return {
+          ...service,
+          status: newStatus,
+          latency: newLatency,
+          lastChecked: "Just now"
+        };
+      });
+      
+      setApiServices(updatedServices);
       setIsRefreshing(false);
+      setLastRefreshed(new Date());
+      
+      // Count statuses for the toast message
+      const operational = updatedServices.filter(s => s.status === "operational").length;
+      const degraded = updatedServices.filter(s => s.status === "degraded").length;
+      const down = updatedServices.filter(s => s.status === "down").length;
+      
       toast({
         title: "Status Refreshed",
-        description: "All API statuses have been updated"
+        description: `${operational} operational, ${degraded} degraded, ${down} down services`
       });
     }, 1500);
   };
@@ -71,6 +131,11 @@ const ApiStatus = () => {
     }
   };
 
+  // Count services by status
+  const operationalCount = apiServices.filter(s => s.status === "operational").length;
+  const degradedCount = apiServices.filter(s => s.status === "degraded").length;
+  const downCount = apiServices.filter(s => s.status === "down").length;
+
   return (
     <AdminLayout currentPage="/admin/api-status">
       <div className="flex justify-between items-center mb-6">
@@ -99,15 +164,15 @@ const ApiStatus = () => {
           <div className="flex flex-wrap gap-2 mb-4">
             <div className="bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm flex items-center">
               <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-              5 Operational
+              {operationalCount} Operational
             </div>
             <div className="bg-amber-100 text-amber-800 rounded-full px-3 py-1 text-sm flex items-center">
               <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
-              1 Degraded
+              {degradedCount} Degraded
             </div>
             <div className="bg-red-100 text-red-800 rounded-full px-3 py-1 text-sm flex items-center">
               <AlertCircle className="h-3.5 w-3.5 mr-1.5" />
-              1 Down
+              {downCount} Down
             </div>
           </div>
           

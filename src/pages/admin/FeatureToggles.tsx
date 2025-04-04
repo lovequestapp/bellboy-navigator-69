@@ -1,10 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Save, Plus, RefreshCw, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -12,8 +11,7 @@ import { toast } from "@/hooks/use-toast";
 const FeatureToggles = () => {
   const [isSaving, setIsSaving] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  
-  const features = [
+  const [features, setFeatures] = useState([
     { 
       id: "new-booking-flow", 
       name: "New Booking Flow", 
@@ -70,7 +68,7 @@ const FeatureToggles = () => {
       enabled: true,
       category: "Mobile Features"
     }
-  ];
+  ]);
   
   const filteredFeatures = features.filter(feature => 
     feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -86,7 +84,15 @@ const FeatureToggles = () => {
   };
   
   const handleToggleChange = (featureId: string) => {
-    // In a real app, this would update the state
+    // Update the feature toggle state
+    setFeatures(prevFeatures => 
+      prevFeatures.map(feature => 
+        feature.id === featureId 
+          ? { ...feature, enabled: !feature.enabled } 
+          : feature
+      )
+    );
+    
     toast({
       title: "Feature Updated",
       description: `Feature '${featureId}' status has been toggled`
@@ -101,7 +107,7 @@ const FeatureToggles = () => {
       setIsSaving(false);
       toast({
         title: "Features Saved",
-        description: "Feature toggle configurations have been updated."
+        description: "Feature toggle configurations have been updated successfully."
       });
     }, 1200);
   };
