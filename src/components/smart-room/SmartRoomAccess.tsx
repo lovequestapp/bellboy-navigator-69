@@ -1,11 +1,16 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "@/hooks/use-toast";
-import { DoorOpen, Thermometer, Lightbulb, Lock, Volume2, Tv, PhoneCall, WifiIcon } from "lucide-react";
+import { 
+  DoorOpen, Thermometer, Lightbulb, Lock, Volume2, Tv, 
+  PhoneCall, WifiIcon, Activity, Battery, Bluetooth,
+  Settings, Cloud, Power, Cog, Home, Monitor, Earth
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SmartRoomProps {
@@ -23,17 +28,58 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
   const [lightsOn, setLightsOn] = useState({
     main: false,
     bathroom: false,
-    bedside: false
+    bedside: false,
+    ambient: false
   });
   const [tvOn, setTvOn] = useState(false);
   const [doNotDisturb, setDoNotDisturb] = useState(false);
+  const [curtainsOpen, setCurtainsOpen] = useState(false);
+  const [roomMode, setRoomMode] = useState<string>("default");
+  const [wifiConnected, setWifiConnected] = useState(true);
+  const [roomService, setRoomService] = useState(false);
+  const [energyUsage, setEnergyUsage] = useState(0);
+  const [syncStatus, setSyncStatus] = useState("Connected");
+  const [syncInterval, setSyncInterval] = useState<number | null>(null);
+
+  // Simulate energy usage calculation
+  useEffect(() => {
+    // Calculate energy usage based on what's turned on
+    let usage = 0;
+    if (lightsOn.main) usage += 15;
+    if (lightsOn.bathroom) usage += 10;
+    if (lightsOn.bedside) usage += 5;
+    if (lightsOn.ambient) usage += 8;
+    if (tvOn) usage += 30;
+    
+    setEnergyUsage(usage);
+  }, [lightsOn, tvOn]);
+
+  // Simulate periodic synchronization with hotel systems
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      // Simulate occasional sync issues
+      const syncSuccess = Math.random() > 0.05;
+      
+      if (syncSuccess) {
+        setSyncStatus("Connected");
+      } else {
+        setSyncStatus("Reconnecting...");
+        setTimeout(() => setSyncStatus("Connected"), 3000);
+      }
+    }, 30000);
+    
+    setSyncInterval(interval);
+    return () => {
+      if (syncInterval) clearInterval(syncInterval);
+    };
+  }, []);
   
   const handleUnlockDoor = () => {
     setDoorUnlocked(true);
     // Simulate door unlocking
     toast({
       title: "Door Unlocked",
-      description: `Room ${roomNumber} door has been unlocked.`
+      description: `Room ${roomNumber} door has been unlocked. Auto-lock in 30 seconds.`
     });
     
     // Auto-lock after 30 seconds
@@ -73,10 +119,184 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
     });
   };
 
+  const toggleCurtains = () => {
+    setCurtainsOpen(prev => !prev);
+    toast({
+      title: "Smart Curtains",
+      description: !curtainsOpen ? "Opened" : "Closed"
+    });
+  };
+
+  const handleRoomModeChange = (value: string) => {
+    if (!value) return; // Skip if value is empty (deselect)
+    
+    setRoomMode(value);
+    
+    // Apply room mode settings
+    switch (value) {
+      case "sleep":
+        setLightsOn({ main: false, bathroom: false, bedside: true, ambient: false });
+        setTemperature(68);
+        setDoNotDisturb(true);
+        setCurtainsOpen(false);
+        setTvOn(false);
+        break;
+      case "work":
+        setLightsOn({ main: true, bathroom: false, bedside: true, ambient: false });
+        setTemperature(72);
+        setDoNotDisturb(true);
+        setCurtainsOpen(true);
+        setTvOn(false);
+        break;
+      case "relax":
+        setLightsOn({ main: false, bathroom: false, bedside: false, ambient: true });
+        setTemperature(74);
+        setDoNotDisturb(true);
+        setCurtainsOpen(false);
+        setTvOn(true);
+        break;
+      case "eco":
+        setLightsOn({ main: false, bathroom: false, bedside: false, ambient: false });
+        setTemperature(76);
+        setDoNotDisturb(false);
+        setCurtainsOpen(true);
+        setTvOn(false);
+        break;
+      default:
+        setLightsOn({ main: true, bathroom: false, bedside: false, ambient: false });
+        setTemperature(72);
+        setDoNotDisturb(false);
+        setCurtainsOpen(true);
+        break;
+    }
+    
+    toast({
+      title: "Room Mode Activated",
+      description: `${value.charAt(0).toUpperCase() + value.slice(1)} mode settings applied`
+    });
+  };
+
+  const toggleRoomService = () => {
+    setRoomService(prev => !prev);
+    toast({
+      title: "Room Service",
+      description: !roomService 
+        ? "Your request has been sent to hotel staff" 
+        : "Room service request canceled"
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-serif font-semibold">Smart Room Controls</h2>
-      <p className="text-muted-foreground">Control your room's features from anywhere</p>
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
+        <div>
+          <h1 className="text-3xl font-serif font-semibold bg-gradient-to-r from-bellboy to-bellboy-light bg-clip-text text-transparent">
+            Smart Room Control
+          </h1>
+          <p className="text-muted-foreground">
+            Control your room's features remotely
+          </p>
+        </div>
+        <div className="flex items-center mt-4 md:mt-0 space-x-4">
+          <div className="flex items-center">
+            <div className={`w-2 h-2 rounded-full mr-2 ${syncStatus === "Connected" ? "bg-green-500" : "bg-yellow-500 animate-pulse"}`}></div>
+            <span className="text-sm text-muted-foreground">{syncStatus}</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-bellboy/20 text-bellboy hover:bg-bellboy/10"
+            onClick={() => toast({
+              title: "Synchronizing with Hotel Systems",
+              description: "Refreshing connection to hotel network"
+            })}
+          >
+            <Cloud className="h-4 w-4 mr-2" />
+            Sync
+          </Button>
+        </div>
+      </div>
+      
+      {/* Room Status Overview */}
+      <Card className="bg-gradient-to-r from-bellboy/5 to-transparent border-bellboy/10">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex flex-col items-center justify-center p-3 bg-white/60 dark:bg-black/10 backdrop-blur-sm rounded-lg">
+              <span className="text-xs text-muted-foreground mb-1">Temperature</span>
+              <div className="flex items-center">
+                <Thermometer size={14} className="text-bellboy mr-1" />
+                <span className="text-lg font-semibold">{temperature}°F</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white/60 dark:bg-black/10 backdrop-blur-sm rounded-lg">
+              <span className="text-xs text-muted-foreground mb-1">Energy Usage</span>
+              <div className="flex items-center">
+                <Activity size={14} className="text-bellboy mr-1" />
+                <span className="text-lg font-semibold">{energyUsage}W</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white/60 dark:bg-black/10 backdrop-blur-sm rounded-lg">
+              <span className="text-xs text-muted-foreground mb-1">Door</span>
+              <div className="flex items-center">
+                <Lock size={14} className={doorUnlocked ? "text-red-500 mr-1" : "text-green-500 mr-1"} />
+                <span className="text-lg font-semibold">{doorUnlocked ? "Unlocked" : "Locked"}</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white/60 dark:bg-black/10 backdrop-blur-sm rounded-lg">
+              <span className="text-xs text-muted-foreground mb-1">Room Mode</span>
+              <div className="flex items-center">
+                <Home size={14} className="text-bellboy mr-1" />
+                <span className="text-lg font-semibold capitalize">{roomMode}</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Room Modes */}
+      <Card className="border-bellboy/20 hover:border-bellboy/40 transition-colors">
+        <CardHeader className="pb-2">
+          <CardTitle className="font-serif text-lg flex items-center">
+            <Settings className="mr-2 text-bellboy" size={20} />
+            Room Modes
+          </CardTitle>
+          <CardDescription>
+            Quick presets to set your perfect environment
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ToggleGroup 
+            type="single" 
+            value={roomMode} 
+            onValueChange={handleRoomModeChange} 
+            className="grid grid-cols-2 md:grid-cols-5 gap-2"
+          >
+            <ToggleGroupItem value="default" className="flex-1 data-[state=on]:bg-gradient-to-r data-[state=on]:from-bellboy data-[state=on]:to-bellboy-light data-[state=on]:text-white">
+              <Home className="mr-2 h-4 w-4" />
+              Default
+            </ToggleGroupItem>
+            <ToggleGroupItem value="sleep" className="flex-1 data-[state=on]:bg-gradient-to-r data-[state=on]:from-bellboy data-[state=on]:to-bellboy-light data-[state=on]:text-white">
+              <Settings className="mr-2 h-4 w-4" />
+              Sleep
+            </ToggleGroupItem>
+            <ToggleGroupItem value="work" className="flex-1 data-[state=on]:bg-gradient-to-r data-[state=on]:from-bellboy data-[state=on]:to-bellboy-light data-[state=on]:text-white">
+              <Monitor className="mr-2 h-4 w-4" />
+              Work
+            </ToggleGroupItem>
+            <ToggleGroupItem value="relax" className="flex-1 data-[state=on]:bg-gradient-to-r data-[state=on]:from-bellboy data-[state=on]:to-bellboy-light data-[state=on]:text-white">
+              <Settings className="mr-2 h-4 w-4" />
+              Relax
+            </ToggleGroupItem>
+            <ToggleGroupItem value="eco" className="flex-1 data-[state=on]:bg-gradient-to-r data-[state=on]:from-bellboy data-[state=on]:to-bellboy-light data-[state=on]:text-white">
+              <Earth className="mr-2 h-4 w-4" />
+              Eco
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </CardContent>
+      </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Door Access Card */}
@@ -95,13 +315,21 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">Room {roomNumber}</p>
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <Button 
                 onClick={handleUnlockDoor} 
                 disabled={doorUnlocked}
-                className="w-full bg-bellboy hover:bg-bellboy-light text-white"
+                className="bg-bellboy hover:bg-bellboy-light text-white"
               >
                 Unlock Door <Lock className="ml-2" size={16} />
+              </Button>
+              
+              <Button
+                onClick={toggleCurtains}
+                variant="outline"
+                className="border-bellboy/30 text-bellboy"
+              >
+                {curtainsOpen ? "Close Curtains" : "Open Curtains"}
               </Button>
             </div>
           </CardContent>
@@ -154,7 +382,7 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full ${lightsOn.main ? 'bg-yellow-100' : 'bg-gray-100'} flex items-center justify-center mr-3`}>
@@ -196,6 +424,20 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
                 onCheckedChange={() => handleLightToggle('bedside')}
               />
             </div>
+            
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center">
+                <div className={`w-8 h-8 rounded-full ${lightsOn.ambient ? 'bg-yellow-100' : 'bg-gray-100'} flex items-center justify-center mr-3`}>
+                  <Lightbulb size={16} className={lightsOn.ambient ? 'text-yellow-500' : 'text-gray-400'} />
+                </div>
+                <Label htmlFor="ambient-light">Ambient</Label>
+              </div>
+              <Switch
+                id="ambient-light"
+                checked={lightsOn.ambient}
+                onCheckedChange={() => handleLightToggle('ambient')}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -206,7 +448,7 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
           <CardTitle className="font-serif text-lg">Room Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3`}>
@@ -240,6 +482,32 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
                 onCheckedChange={() => setTvOn(prev => !prev)}
               />
             </div>
+            
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center">
+                <div className={`w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3`}>
+                  <WifiIcon size={16} className="text-bellboy" />
+                </div>
+                <div>
+                  <Label htmlFor="wifi-switch">Wi-Fi</Label>
+                  <p className="text-xs text-muted-foreground">Room guest network</p>
+                </div>
+              </div>
+              <Switch
+                id="wifi-switch"
+                checked={wifiConnected}
+                onCheckedChange={() => setWifiConnected(prev => !prev)}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <Button 
+              className="w-full border border-bellboy text-white bg-bellboy hover:bg-bellboy-light"
+              onClick={toggleRoomService}
+            >
+              {roomService ? "Cancel Room Service" : "Request Room Service"}
+            </Button>
           </div>
         </CardContent>
         <CardFooter>
@@ -251,16 +519,36 @@ const SmartRoomAccess: React.FC<SmartRoomProps> = ({ roomNumber, hotel }) => {
                 title: "Room Reset",
                 description: "All room settings have been reset to default"
               });
-              setLightsOn({ main: false, bathroom: false, bedside: false });
+              setLightsOn({ main: false, bathroom: false, bedside: false, ambient: false });
               setTemperature(72);
               setTvOn(false);
               setDoNotDisturb(false);
+              setCurtainsOpen(false);
+              setRoomMode("default");
             }}
           >
             Reset All Settings
           </Button>
         </CardFooter>
       </Card>
+
+      {/* System Info */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground mt-10 px-2">
+        <div className="flex items-center">
+          <Activity size={14} className="mr-1" />
+          <span>System v2.4.1</span>
+        </div>
+        
+        <div className="flex items-center">
+          <Bluetooth size={14} className="mr-1" />
+          <span>Connected</span>
+        </div>
+        
+        <div className="flex items-center">
+          <Battery size={14} className="mr-1" />
+          <span>Power: 98%</span>
+        </div>
+      </div>
     </div>
   );
 };

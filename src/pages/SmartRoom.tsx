@@ -5,21 +5,24 @@ import SmartRoomAccess from "@/components/smart-room/SmartRoomAccess";
 import { getUpcomingHotels } from "@/services/hotelService";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { DoorClosed, Loader2 } from "lucide-react";
+import { DoorClosed, Loader2, Shield, Fingerprint } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SmartRoom: React.FC = () => {
   const navigate = useNavigate();
   const upcomingHotels = getUpcomingHotels();
   const [isLoading, setIsLoading] = useState(true);
   const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isBiometricOpen, setIsBiometricOpen] = useState(false);
+  const [biometricProgress, setBiometricProgress] = useState(0);
   
   useEffect(() => {
     // Simulate loading time for room access verification
     const timer = setTimeout(() => {
       setIsLoading(false);
       if (upcomingHotels.length > 0) {
-        setIsAccessGranted(true);
+        setIsAccessGranted(false); // We'll require explicit verification for enhanced security
       }
     }, 1500);
     
@@ -27,18 +30,33 @@ const SmartRoom: React.FC = () => {
   }, [upcomingHotels.length]);
   
   const handleRoomAccessAttempt = () => {
-    setIsLoading(true);
+    setIsBiometricOpen(true);
     
-    // Simulate room access verification
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsAccessGranted(true);
+    // Simulate biometric scanning
+    let progress = 0;
+    const scanInterval = setInterval(() => {
+      progress += 7;
+      setBiometricProgress(progress);
       
-      toast({
-        title: "Room Access Granted",
-        description: "You now have access to Room 412"
-      });
-    }, 2000);
+      if (progress >= 100) {
+        clearInterval(scanInterval);
+        setTimeout(() => {
+          setIsBiometricOpen(false);
+          setIsLoading(true);
+          
+          // After a short delay, grant access
+          setTimeout(() => {
+            setIsLoading(false);
+            setIsAccessGranted(true);
+            
+            toast({
+              title: "Biometric Authentication Successful",
+              description: "You now have secure access to Room 412"
+            });
+          }, 1200);
+        }, 500);
+      }
+    }, 150);
   };
   
   // If no hotel stays, show a prompt to add one
@@ -72,8 +90,12 @@ const SmartRoom: React.FC = () => {
           <Loader2 size={40} className="text-bellboy animate-spin mb-4" />
           <h2 className="text-xl font-serif font-medium mb-2">Verifying Room Access</h2>
           <p className="text-muted-foreground max-w-md">
-            Please wait while we verify your room access credentials...
+            Please wait while we synchronize with the hotel systems...
           </p>
+          <div className="w-64 h-1 bg-gray-200 rounded-full mt-6 overflow-hidden">
+            <div className="h-full bg-bellboy animate-pulse" style={{width: '60%'}}></div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Secure Channel Established</p>
         </div>
       </PageContainer>
     );
@@ -83,21 +105,76 @@ const SmartRoom: React.FC = () => {
   if (!isAccessGranted) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-            <DoorClosed size={30} className="text-yellow-700" />
+        <div className="flex flex-col items-center justify-center py-12 text-center glass-card mx-auto max-w-md">
+          <div className="w-16 h-16 bg-gradient-to-r from-bellboy to-bellboy-light rounded-full flex items-center justify-center mb-4">
+            <Shield size={30} className="text-white" />
           </div>
-          <h2 className="text-2xl font-serif font-semibold mb-2">Verify Room Access</h2>
+          <h2 className="text-2xl font-serif font-semibold mb-2">Secure Room Access</h2>
           <p className="text-muted-foreground mb-6 max-w-md">
-            You have an active stay at {upcomingHotels[0].name}. Please verify your identity to access room controls.
+            Welcome to {upcomingHotels[0].name}. For your security, please verify your identity to access your room controls.
           </p>
+          
+          <div className="bg-black/5 backdrop-blur-lg p-6 rounded-lg w-full mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium">Room:</span>
+              <span className="text-bellboy">412</span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium">Check-in:</span>
+              <span>{new Date().toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Check-out:</span>
+              <span>{new Date(Date.now() + 86400000 * 3).toLocaleDateString()}</span>
+            </div>
+          </div>
+          
           <Button 
             onClick={handleRoomAccessAttempt}
-            className="bg-bellboy hover:bg-bellboy-light text-white"
+            className="w-full bg-gradient-to-r from-bellboy to-bellboy-light text-white hover:opacity-90 transition-all shadow-luxury"
+            size="lg"
           >
-            Verify Identity
+            <Fingerprint className="mr-2" size={18} />
+            Authenticate Access
           </Button>
+          
+          <p className="text-xs text-muted-foreground mt-4">
+            Your biometric data is securely stored and never leaves your device
+          </p>
         </div>
+
+        {/* Biometric Authentication Dialog */}
+        <Dialog open={isBiometricOpen} onOpenChange={setIsBiometricOpen}>
+          <DialogContent className="sm:max-w-md bg-black/80 text-white border-white/20">
+            <DialogHeader>
+              <DialogTitle className="text-center text-white">Biometric Authentication</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center justify-center py-6 space-y-6">
+              <div className="relative w-32 h-32 flex items-center justify-center">
+                <div className="absolute inset-0 border-4 border-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 border-4 border-transparent border-t-bellboy rounded-full animate-spin"></div>
+                <Fingerprint size={56} className="text-white/80" />
+              </div>
+              
+              <div className="w-full space-y-2">
+                <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-bellboy to-bellboy-light transition-all duration-300" 
+                    style={{ width: `${biometricProgress}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-white/60">
+                  <span>Processing</span>
+                  <span>{biometricProgress}%</span>
+                </div>
+              </div>
+              
+              <p className="text-sm text-white/60 text-center">
+                Please keep your finger on the scanner
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </PageContainer>
     );
   }

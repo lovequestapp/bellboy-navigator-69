@@ -12,6 +12,8 @@ interface Hotel {
   images?: string[];
   status: "active" | "maintenance" | "inactive";
   featured: boolean;
+  smartRoomEnabled?: boolean; // Added for smart room functionality
+  wifiNetwork?: string; // Added for smart room connectivity
 }
 
 // Initial hotel data
@@ -22,10 +24,12 @@ const initialHotels: Hotel[] = [
     location: "New York, NY",
     description: "A luxurious 5-star hotel in the heart of Manhattan with stunning views of Central Park.",
     starRating: 5,
-    amenities: ["Pool", "Spa", "Gym", "Restaurant", "Bar", "Room Service", "WiFi", "Parking"],
+    amenities: ["Pool", "Spa", "Gym", "Restaurant", "Bar", "Room Service", "WiFi", "Parking", "Smart Room Technology"],
     images: ["grand_hotel_1.jpg", "grand_hotel_2.jpg", "grand_hotel_3.jpg"],
     status: "active",
-    featured: true
+    featured: true,
+    smartRoomEnabled: true,
+    wifiNetwork: "GRAND_GUEST"
   },
   {
     id: "h2",
@@ -33,10 +37,12 @@ const initialHotels: Hotel[] = [
     location: "Miami, FL",
     description: "A beautiful beachfront resort with private access to white sand beaches and crystal clear waters.",
     starRating: 4,
-    amenities: ["Beach Access", "Pool", "Restaurant", "Bar", "WiFi", "Parking"],
+    amenities: ["Beach Access", "Pool", "Restaurant", "Bar", "WiFi", "Parking", "Smart Room Technology"],
     images: ["seaside_resort_1.jpg", "seaside_resort_2.jpg"],
     status: "active",
-    featured: true
+    featured: true,
+    smartRoomEnabled: true,
+    wifiNetwork: "SEASIDE_SECURE"
   },
   {
     id: "h3",
@@ -44,10 +50,12 @@ const initialHotels: Hotel[] = [
     location: "Aspen, CO",
     description: "A cozy mountain lodge perfect for ski vacations with direct access to ski slopes.",
     starRating: 4,
-    amenities: ["Ski-in/Ski-out", "Fireplace", "Hot Tub", "Restaurant", "Bar", "WiFi"],
+    amenities: ["Ski-in/Ski-out", "Fireplace", "Hot Tub", "Restaurant", "Bar", "WiFi", "Smart Room Technology"],
     images: ["mountain_lodge_1.jpg", "mountain_lodge_2.jpg"],
     status: "active",
-    featured: false
+    featured: false,
+    smartRoomEnabled: true,
+    wifiNetwork: "LODGE_NET"
   },
   {
     id: "h4",
@@ -58,7 +66,8 @@ const initialHotels: Hotel[] = [
     amenities: ["Business Center", "Restaurant", "Gym", "WiFi", "Parking"],
     images: ["city_center_1.jpg"],
     status: "active",
-    featured: false
+    featured: false,
+    smartRoomEnabled: false
   },
   {
     id: "h5",
@@ -69,7 +78,8 @@ const initialHotels: Hotel[] = [
     amenities: ["Ocean View", "Pool", "Restaurant", "Bar", "WiFi", "Parking"],
     images: ["sunset_inn_1.jpg", "sunset_inn_2.jpg"],
     status: "maintenance",
-    featured: false
+    featured: false,
+    smartRoomEnabled: false
   },
   {
     id: "h6",
@@ -77,10 +87,12 @@ const initialHotels: Hotel[] = [
     location: "Boston, MA",
     description: "An elegant hotel housed in a restored 19th century mansion with period decor and modern amenities.",
     starRating: 4,
-    amenities: ["Garden", "Library", "Restaurant", "Bar", "WiFi", "Parking"],
+    amenities: ["Garden", "Library", "Restaurant", "Bar", "WiFi", "Parking", "Smart Room Technology"],
     images: ["historic_mansion_1.jpg"],
     status: "active",
-    featured: true
+    featured: true,
+    smartRoomEnabled: true,
+    wifiNetwork: "MANSION_GUEST"
   }
 ];
 
@@ -94,6 +106,8 @@ const simulateApiCall = <T>(data: T, delay: number = 500): Promise<T> => {
 export function useHotels() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoomSystemConnected, setIsRoomSystemConnected] = useState<boolean>(false);
+  const [connectionStatus, setConnectionStatus] = useState<string>("");
 
   useEffect(() => {
     // Load hotels on initial render
@@ -118,13 +132,14 @@ export function useHotels() {
     loadHotels();
   }, []);
 
-  const addHotel = async (hotelData: Omit<Hotel, "id" | "images" | "amenities">): Promise<Hotel> => {
+  const addHotel = async (hotelData: Omit<Hotel, "id" | "images" | "amenities" | "smartRoomEnabled" | "wifiNetwork">): Promise<Hotel> => {
     // Create a new hotel object
     const newHotel: Hotel = {
       ...hotelData,
       id: `h${Date.now()}`, // Generate a unique ID
       images: [],
       amenities: [],
+      smartRoomEnabled: false,
     };
 
     try {
@@ -194,12 +209,94 @@ export function useHotels() {
     }
   };
 
+  // New function to connect to a hotel's smart room system
+  const connectToHotelSystem = async (hotelId: string): Promise<boolean> => {
+    try {
+      setConnectionStatus("Connecting to hotel system...");
+      
+      // Find the hotel
+      const hotel = hotels.find(h => h.id === hotelId);
+      
+      if (!hotel) {
+        throw new Error("Hotel not found");
+      }
+      
+      if (!hotel.smartRoomEnabled) {
+        throw new Error("This hotel does not support smart room technology");
+      }
+      
+      // Simulate connection process
+      await simulateApiCall(null, 1500);
+      
+      // 90% success rate
+      const successful = Math.random() <= 0.9;
+      
+      if (successful) {
+        setIsRoomSystemConnected(true);
+        setConnectionStatus("Connected");
+        toast({
+          title: "Connected to Hotel System",
+          description: `Successfully connected to ${hotel.name} via ${hotel.wifiNetwork}`,
+        });
+        return true;
+      } else {
+        setIsRoomSystemConnected(false);
+        setConnectionStatus("Failed");
+        toast({
+          title: "Connection Failed",
+          description: "Could not establish connection with hotel system",
+          variant: "destructive",
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error("Failed to connect to hotel system:", error);
+      setIsRoomSystemConnected(false);
+      setConnectionStatus("Error");
+      toast({
+        title: "Connection Error",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Function to disconnect from hotel system
+  const disconnectFromHotelSystem = async (): Promise<void> => {
+    try {
+      setConnectionStatus("Disconnecting...");
+      
+      // Simulate disconnection process
+      await simulateApiCall(null, 800);
+      
+      setIsRoomSystemConnected(false);
+      setConnectionStatus("");
+      
+      toast({
+        title: "Disconnected",
+        description: "Successfully disconnected from hotel system",
+      });
+    } catch (error) {
+      console.error("Failed to disconnect from hotel system:", error);
+      toast({
+        title: "Disconnection Error",
+        description: "Failed to properly disconnect from hotel system",
+        variant: "destructive",
+      });
+    }
+  };
+
   return { 
     hotels, 
     isLoading, 
     addHotel, 
     updateHotel, 
     deleteHotel, 
-    toggleFeatured 
+    toggleFeatured,
+    connectToHotelSystem,
+    disconnectFromHotelSystem,
+    isRoomSystemConnected,
+    connectionStatus
   };
 }
