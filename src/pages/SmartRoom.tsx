@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { DoorClosed, Loader2, Shield, Fingerprint } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SmartRoom: React.FC = () => {
   const navigate = useNavigate();
@@ -63,7 +64,12 @@ const SmartRoom: React.FC = () => {
   if (upcomingHotels.length === 0 && !isLoading) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center justify-center py-12 text-center"
+        >
           <div className="w-16 h-16 bg-bellboy/10 rounded-full flex items-center justify-center mb-4">
             <DoorClosed size={30} className="text-bellboy" />
           </div>
@@ -77,7 +83,7 @@ const SmartRoom: React.FC = () => {
           >
             Add Hotel Stay
           </Button>
-        </div>
+        </motion.div>
       </PageContainer>
     );
   }
@@ -86,17 +92,26 @@ const SmartRoom: React.FC = () => {
   if (isLoading) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center py-12 text-center"
+        >
           <Loader2 size={40} className="text-bellboy animate-spin mb-4" />
           <h2 className="text-xl font-serif font-medium mb-2">Verifying Room Access</h2>
           <p className="text-muted-foreground max-w-md">
             Please wait while we synchronize with the hotel systems...
           </p>
           <div className="w-64 h-1 bg-gray-200 rounded-full mt-6 overflow-hidden">
-            <div className="h-full bg-bellboy animate-pulse" style={{width: '60%'}}></div>
+            <motion.div 
+              className="h-full bg-bellboy"
+              initial={{ width: "0%" }}
+              animate={{ width: "60%" }}
+              transition={{ duration: 1.5 }}
+            ></motion.div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">Secure Channel Established</p>
-        </div>
+        </motion.div>
       </PageContainer>
     );
   }
@@ -105,7 +120,12 @@ const SmartRoom: React.FC = () => {
   if (!isAccessGranted) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-12 text-center glass-card mx-auto max-w-md">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center justify-center py-12 text-center glass-card mx-auto max-w-md"
+        >
           <div className="w-16 h-16 bg-gradient-to-r from-bellboy to-bellboy-light rounded-full flex items-center justify-center mb-4">
             <Shield size={30} className="text-white" />
           </div>
@@ -114,7 +134,12 @@ const SmartRoom: React.FC = () => {
             Welcome to {upcomingHotels[0].name}. For your security, please verify your identity to access your room controls.
           </p>
           
-          <div className="bg-black/5 backdrop-blur-lg p-6 rounded-lg w-full mb-6">
+          <motion.div 
+            className="bg-black/5 backdrop-blur-lg p-6 rounded-lg w-full mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">Room:</span>
               <span className="text-bellboy">412</span>
@@ -127,21 +152,27 @@ const SmartRoom: React.FC = () => {
               <span className="font-medium">Check-out:</span>
               <span>{new Date(Date.now() + 86400000 * 3).toLocaleDateString()}</span>
             </div>
-          </div>
+          </motion.div>
           
-          <Button 
-            onClick={handleRoomAccessAttempt}
-            className="w-full bg-gradient-to-r from-bellboy to-bellboy-light text-white hover:opacity-90 transition-all shadow-luxury"
-            size="lg"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full"
           >
-            <Fingerprint className="mr-2" size={18} />
-            Authenticate Access
-          </Button>
+            <Button 
+              onClick={handleRoomAccessAttempt}
+              className="w-full bg-gradient-to-r from-bellboy to-bellboy-light text-white hover:opacity-90 transition-all shadow-luxury"
+              size="lg"
+            >
+              <Fingerprint className="mr-2" size={18} />
+              Authenticate Access
+            </Button>
+          </motion.div>
           
           <p className="text-xs text-muted-foreground mt-4">
             Your biometric data is securely stored and never leaves your device
           </p>
-        </div>
+        </motion.div>
 
         {/* Biometric Authentication Dialog */}
         <Dialog open={isBiometricOpen} onOpenChange={setIsBiometricOpen}>
@@ -151,17 +182,25 @@ const SmartRoom: React.FC = () => {
             </DialogHeader>
             <div className="flex flex-col items-center justify-center py-6 space-y-6">
               <div className="relative w-32 h-32 flex items-center justify-center">
-                <div className="absolute inset-0 border-4 border-white/20 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 border-4 border-transparent border-t-bellboy rounded-full animate-spin"></div>
+                <motion.div 
+                  className="absolute inset-0 border-4 border-white/20 rounded-full"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                ></motion.div>
+                <motion.div 
+                  className="absolute inset-0 border-4 border-transparent border-t-bellboy rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                ></motion.div>
                 <Fingerprint size={56} className="text-white/80" />
               </div>
               
               <div className="w-full space-y-2">
                 <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                  <div 
+                  <motion.div 
                     className="h-full bg-gradient-to-r from-bellboy to-bellboy-light transition-all duration-300" 
                     style={{ width: `${biometricProgress}%` }}
-                  ></div>
+                  ></motion.div>
                 </div>
                 <div className="flex justify-between text-xs text-white/60">
                   <span>Processing</span>
@@ -179,16 +218,25 @@ const SmartRoom: React.FC = () => {
     );
   }
   
-  // Show room access controls
+  // Show room access controls with animation
   return (
     <PageContainer>
-      <SmartRoomAccess 
-        roomNumber="412" 
-        hotel={{
-          name: upcomingHotels[0].name,
-          id: upcomingHotels[0].id
-        }} 
-      />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="room-access"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <SmartRoomAccess 
+            roomNumber="412" 
+            hotel={{
+              name: upcomingHotels[0].name,
+              id: upcomingHotels[0].id
+            }} 
+          />
+        </motion.div>
+      </AnimatePresence>
     </PageContainer>
   );
 };
