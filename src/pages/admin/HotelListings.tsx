@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
   Card,
@@ -27,7 +27,8 @@ import {
   Plus, 
   Search, 
   Star, 
-  Trash
+  Trash,
+  Loader2
 } from "lucide-react";
 import { 
   Dialog, 
@@ -58,97 +59,36 @@ import {
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-
-// Mock hotel data
-const hotelData = [
-  {
-    id: "h1",
-    name: "The Grand Hotel",
-    location: "New York, NY",
-    description: "A luxurious 5-star hotel in the heart of Manhattan with stunning views of Central Park.",
-    starRating: 5,
-    amenities: ["Pool", "Spa", "Gym", "Restaurant", "Bar", "Room Service", "WiFi", "Parking"],
-    images: ["grand_hotel_1.jpg", "grand_hotel_2.jpg", "grand_hotel_3.jpg"],
-    status: "active",
-    featured: true
-  },
-  {
-    id: "h2",
-    name: "Seaside Resort",
-    location: "Miami, FL",
-    description: "A beautiful beachfront resort with private access to white sand beaches and crystal clear waters.",
-    starRating: 4,
-    amenities: ["Beach Access", "Pool", "Restaurant", "Bar", "WiFi", "Parking"],
-    images: ["seaside_resort_1.jpg", "seaside_resort_2.jpg"],
-    status: "active",
-    featured: true
-  },
-  {
-    id: "h3",
-    name: "Mountain Lodge",
-    location: "Aspen, CO",
-    description: "A cozy mountain lodge perfect for ski vacations with direct access to ski slopes.",
-    starRating: 4,
-    amenities: ["Ski-in/Ski-out", "Fireplace", "Hot Tub", "Restaurant", "Bar", "WiFi"],
-    images: ["mountain_lodge_1.jpg", "mountain_lodge_2.jpg"],
-    status: "active",
-    featured: false
-  },
-  {
-    id: "h4",
-    name: "City Center Hotel",
-    location: "Chicago, IL",
-    description: "A modern hotel located in downtown Chicago, close to major attractions and business districts.",
-    starRating: 3,
-    amenities: ["Business Center", "Restaurant", "Gym", "WiFi", "Parking"],
-    images: ["city_center_1.jpg"],
-    status: "active",
-    featured: false
-  },
-  {
-    id: "h5",
-    name: "Sunset Inn",
-    location: "San Diego, CA",
-    description: "A charming boutique hotel offering beautiful sunset views over the Pacific Ocean.",
-    starRating: 4,
-    amenities: ["Ocean View", "Pool", "Restaurant", "Bar", "WiFi", "Parking"],
-    images: ["sunset_inn_1.jpg", "sunset_inn_2.jpg"],
-    status: "maintenance",
-    featured: false
-  },
-  {
-    id: "h6",
-    name: "Historic Mansion Hotel",
-    location: "Boston, MA",
-    description: "An elegant hotel housed in a restored 19th century mansion with period decor and modern amenities.",
-    starRating: 4,
-    amenities: ["Garden", "Library", "Restaurant", "Bar", "WiFi", "Parking"],
-    images: ["historic_mansion_1.jpg"],
-    status: "active",
-    featured: true
-  }
-];
+import { useHotels } from "@/hooks/useHotels";
 
 const HotelListings = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [filteredHotels, setFilteredHotels] = React.useState(hotelData);
   const [isAddHotelOpen, setIsAddHotelOpen] = React.useState(false);
-  const [editingHotel, setEditingHotel] = React.useState<typeof hotelData[0] | null>(null);
+  const [editingHotel, setEditingHotel] = React.useState(null);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  
+  const { 
+    hotels, 
+    isLoading, 
+    addHotel, 
+    updateHotel, 
+    deleteHotel, 
+    toggleFeatured 
+  } = useHotels();
 
   // Filter hotels based on search term
-  React.useEffect(() => {
+  const filteredHotels = React.useMemo(() => {
     if (searchTerm.trim() === "") {
-      setFilteredHotels(hotelData);
-    } else {
-      const filtered = hotelData.filter(
-        (hotel) =>
-          hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          hotel.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          hotel.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredHotels(filtered);
+      return hotels;
     }
-  }, [searchTerm]);
+    
+    return hotels.filter(
+      (hotel) =>
+        hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hotel.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hotel.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [hotels, searchTerm]);
 
   // Form for adding/editing a hotel
   const form = useForm({
@@ -184,58 +124,98 @@ const HotelListings = () => {
     }
   }, [editingHotel, form]);
 
-  const onSubmit = (data: any) => {
-    // In a real app, this would call an API
-    const action = editingHotel ? "updated" : "created";
-    const hotelName = data.name;
+  const onSubmit = async (data) => {
+    setIsProcessing(true);
     
-    toast({
-      title: `Hotel ${action}`,
-      description: `${hotelName} has been ${action} successfully.`,
-    });
-    
-    setIsAddHotelOpen(false);
-    setEditingHotel(null);
-    form.reset();
+    try {
+      if (editingHotel) {
+        await updateHotel({
+          ...data,
+          id: editingHotel.id,
+        });
+        
+        toast({
+          title: "Hotel updated",
+          description: `${data.name} has been updated successfully.`,
+        });
+      } else {
+        await addHotel(data);
+        
+        toast({
+          title: "Hotel created",
+          description: `${data.name} has been created successfully.`,
+        });
+      }
+      
+      setIsAddHotelOpen(false);
+      setEditingHotel(null);
+    } catch (error) {
+      console.error("Error saving hotel:", error);
+      toast({
+        title: "Error",
+        description: "There was an error saving the hotel. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleEditHotel = (hotelId: string) => {
-    const hotel = hotelData.find((h) => h.id === hotelId);
+  const handleEditHotel = (hotelId) => {
+    const hotel = hotels.find((h) => h.id === hotelId);
     if (hotel) {
       setEditingHotel(hotel);
       setIsAddHotelOpen(true);
     }
   };
 
-  const handleDeleteHotel = (hotelId: string) => {
-    const hotel = hotelData.find((h) => h.id === hotelId);
+  const handleDeleteHotel = async (hotelId) => {
+    const hotel = hotels.find((h) => h.id === hotelId);
     
     if (hotel) {
-      // In a real app, this would call an API
-      toast({
-        title: "Hotel deleted",
-        description: `${hotel.name} has been deleted.`,
-        variant: "destructive",
-      });
+      try {
+        await deleteHotel(hotelId);
+        
+        toast({
+          title: "Hotel deleted",
+          description: `${hotel.name} has been deleted.`,
+        });
+      } catch (error) {
+        console.error("Error deleting hotel:", error);
+        toast({
+          title: "Error",
+          description: "There was an error deleting the hotel. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const handleToggleFeatured = (hotelId: string) => {
-    const hotel = hotelData.find((h) => h.id === hotelId);
+  const handleToggleFeatured = async (hotelId) => {
+    const hotel = hotels.find((h) => h.id === hotelId);
     
     if (hotel) {
-      const newStatus = !hotel.featured;
-      const actionText = newStatus ? "featured" : "unfeatured";
-      
-      // In a real app, this would call an API
-      toast({
-        title: `Hotel ${actionText}`,
-        description: `${hotel.name} has been ${actionText}.`,
-      });
+      try {
+        const newStatus = !hotel.featured;
+        await toggleFeatured(hotelId, newStatus);
+        
+        const actionText = newStatus ? "featured" : "unfeatured";
+        toast({
+          title: `Hotel ${actionText}`,
+          description: `${hotel.name} has been ${actionText}.`,
+        });
+      } catch (error) {
+        console.error("Error updating featured status:", error);
+        toast({
+          title: "Error",
+          description: "There was an error updating the hotel. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case "active":
         return <Badge className="bg-green-600">Active</Badge>;
@@ -288,84 +268,103 @@ const HotelListings = () => {
             </div>
           </div>
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Rating</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredHotels.map((hotel) => (
-                  <TableRow key={hotel.id}>
-                    <TableCell>
-                      <div className="font-medium">{hotel.name}</div>
-                      <div className="text-sm text-muted-foreground truncate max-w-[240px]">
-                        {hotel.description.substring(0, 60)}...
-                      </div>
-                    </TableCell>
-                    <TableCell>{hotel.location}</TableCell>
-                    <TableCell>
-                      <div className="flex">
-                        {[...Array(hotel.starRating)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        ))}
-                        {[...Array(5 - hotel.starRating)].map((_, i) => (
-                          <Star key={i + hotel.starRating} className="h-4 w-4 text-gray-300" />
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(hotel.status)}</TableCell>
-                    <TableCell>
-                      {hotel.featured ? (
-                        <Badge variant="default" className="bg-blue-600">Featured</Badge>
-                      ) : (
-                        <Badge variant="outline">Not Featured</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleEditHotel(hotel.id)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <ImagePlus className="mr-2 h-4 w-4" />
-                            Manage images
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleToggleFeatured(hotel.id)}>
-                            {hotel.featured ? "Remove from featured" : "Add to featured"}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteHotel(hotel.id)}
-                            className="text-red-600"
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete hotel
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+          {isLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <span className="ml-2">Loading hotels...</span>
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Rating</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredHotels.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        {searchTerm ? (
+                          <div className="text-muted-foreground">No hotels match your search</div>
+                        ) : (
+                          <div className="text-muted-foreground">No hotels available</div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredHotels.map((hotel) => (
+                      <TableRow key={hotel.id}>
+                        <TableCell>
+                          <div className="font-medium">{hotel.name}</div>
+                          <div className="text-sm text-muted-foreground truncate max-w-[240px]">
+                            {hotel.description && hotel.description.substring(0, 60)}...
+                          </div>
+                        </TableCell>
+                        <TableCell>{hotel.location}</TableCell>
+                        <TableCell>
+                          <div className="flex">
+                            {[...Array(hotel.starRating)].map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            ))}
+                            {[...Array(5 - hotel.starRating)].map((_, i) => (
+                              <Star key={i + hotel.starRating} className="h-4 w-4 text-gray-300" />
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(hotel.status)}</TableCell>
+                        <TableCell>
+                          {hotel.featured ? (
+                            <Badge variant="default" className="bg-blue-600">Featured</Badge>
+                          ) : (
+                            <Badge variant="outline">Not Featured</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleEditHotel(hotel.id)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <ImagePlus className="mr-2 h-4 w-4" />
+                                Manage images
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleToggleFeatured(hotel.id)}>
+                                {hotel.featured ? "Remove from featured" : "Add to featured"}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteHotel(hotel.id)}
+                                className="text-red-600"
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Delete hotel
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -488,7 +487,24 @@ const HotelListings = () => {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">{editingHotel ? "Update Hotel" : "Add Hotel"}</Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsAddHotelOpen(false)}
+                  disabled={isProcessing}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isProcessing}>
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {editingHotel ? "Updating..." : "Adding..."}
+                    </>
+                  ) : (
+                    editingHotel ? "Update Hotel" : "Add Hotel"
+                  )}
+                </Button>
               </DialogFooter>
             </form>
           </Form>

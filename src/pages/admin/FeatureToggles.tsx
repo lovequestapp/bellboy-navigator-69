@@ -1,17 +1,44 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { Save, Plus, RefreshCw, Search } from "lucide-react";
+import { Save, Plus, RefreshCw, Search, Loader2, Trash } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+
+interface Feature {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  category: string;
+}
 
 const FeatureToggles = () => {
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [features, setFeatures] = useState([
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAddFeatureOpen, setIsAddFeatureOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [features, setFeatures] = useState<Feature[]>([
     { 
       id: "new-booking-flow", 
       name: "New Booking Flow", 
@@ -70,6 +97,28 @@ const FeatureToggles = () => {
     }
   ]);
   
+  const [featureHistory, setFeatureHistory] = useState<Feature[][]>([]);
+  const [pendingChanges, setPendingChanges] = useState(false);
+  
+  // Form for adding features
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+      enabled: false,
+      category: "Customer Facing",
+    },
+  });
+
+  // Track changes for pending change indicator
+  useEffect(() => {
+    if (featureHistory.length > 0) {
+      const lastSavedState = featureHistory[featureHistory.length - 1];
+      const hasChanges = JSON.stringify(lastSavedState) !== JSON.stringify(features);
+      setPendingChanges(hasChanges);
+    }
+  }, [features, featureHistory]);
+  
   const filteredFeatures = features.filter(feature => 
     feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     feature.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,9 +126,45 @@ const FeatureToggles = () => {
   );
   
   const handleAddFeature = () => {
+    setIsAddFeatureOpen(true);
+  };
+  
+  const onAddFeatureSubmit = (data) => {
+    const newFeature: Feature = {
+      ...data,
+      id: data.name.toLowerCase().replace(/\s+/g, '-'),
+    };
+    
+    // Check for duplicate IDs
+    if (features.some(feature => feature.id === newFeature.id)) {
+      toast({
+        title: "Feature ID already exists",
+        description: "Please use a different feature name",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setFeatures([...features, newFeature]);
+    setIsAddFeatureOpen(false);
+    form.reset();
+    
     toast({
-      title: "Add Feature Toggle",
-      description: "Feature creation form would open here"
+      title: "Feature Added",
+      description: `${newFeature.name} has been added successfully.`
+    });
+  };
+  
+  const handleDeleteFeature = (featureId: string) => {
+    const featureToDelete = features.find(f => f.id === featureId);
+    if (!featureToDelete) return;
+    
+    const newFeatures = features.filter(feature => feature.id !== featureId);
+    setFeatures(newFeatures);
+    
+    toast({
+      title: "Feature Deleted",
+      description: `${featureToDelete.name} has been removed.`
     });
   };
   
@@ -93,18 +178,26 @@ const FeatureToggles = () => {
       )
     );
     
-    toast({
-      title: "Feature Updated",
-      description: `Feature '${featureId}' status has been toggled`
-    });
+    const feature = features.find(f => f.id === featureId);
+    if (feature) {
+      toast({
+        title: "Feature Updated",
+        description: `${feature.name} is now ${!feature.enabled ? 'enabled' : 'disabled'}`
+      });
+    }
   };
   
   const handleSave = () => {
     setIsSaving(true);
     
-    // Simulate saving feature toggle state
+    // Save current state to history for undo capability
+    setFeatureHistory([...featureHistory, [...features]]);
+    
+    // Simulate saving feature toggle state to an API
     setTimeout(() => {
       setIsSaving(false);
+      setPendingChanges(false);
+      
       toast({
         title: "Features Saved",
         description: "Feature toggle configurations have been updated successfully."
@@ -124,13 +217,18 @@ const FeatureToggles = () => {
             <Plus className="mr-2 h-4 w-4" />
             Add Feature
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || !pendingChanges} 
+            className={pendingChanges ? "animate-pulse" : ""}
+          >
             {isSaving ? (
               <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Save className="mr-2 h-4 w-4" />
             )}
             Save Changes
+            {pendingChanges && " *"}
           </Button>
         </div>
       </div>
@@ -185,6 +283,14 @@ const FeatureToggles = () => {
                       checked={feature.enabled}
                       onCheckedChange={() => handleToggleChange(feature.id)}
                     />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteFeature(feature.id)}
+                      className="ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -192,6 +298,120 @@ const FeatureToggles = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Feature Dialog */}
+      <Dialog open={isAddFeatureOpen} onOpenChange={setIsAddFeatureOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Feature Toggle</DialogTitle>
+            <DialogDescription>
+              Create a new feature toggle that can be enabled or disabled in the application.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onAddFeatureSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feature Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="New Feature" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      A user-friendly name for this feature
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Feature description" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Brief explanation of what this feature does
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        {...field}
+                      >
+                        <option value="Customer Facing">Customer Facing</option>
+                        <option value="Admin Tools">Admin Tools</option>
+                        <option value="UI/UX">UI/UX</option>
+                        <option value="Mobile Features">Mobile Features</option>
+                        <option value="AI Features">AI Features</option>
+                        <option value="Internationalization">Internationalization</option>
+                        <option value="Support">Support</option>
+                        <option value="Analytics">Analytics</option>
+                        <option value="Experimental">Experimental</option>
+                      </select>
+                    </FormControl>
+                    <FormDescription>
+                      Group similar features together
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="enabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div>
+                      <FormLabel className="text-base">Status</FormLabel>
+                      <FormDescription>
+                        Should this feature be enabled by default?
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsAddFeatureOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Add Feature
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
