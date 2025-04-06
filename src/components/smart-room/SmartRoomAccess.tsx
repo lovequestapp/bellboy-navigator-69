@@ -14,8 +14,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import RoomModeVisualizer from "./RoomModeVisualizer";
 import { motion } from "framer-motion";
 
-<lov-add-dependency>framer-motion@latest</lov-add-dependency>
-
 interface SmartRoomProps {
   roomNumber: string;
   hotel: {
