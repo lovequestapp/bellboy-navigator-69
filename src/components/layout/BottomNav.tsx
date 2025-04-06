@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Bed, Bell, MapPin, ChefHat, User } from "lucide-react";
+import { Bed, Bell, MapPin, ChefHat, User, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -27,9 +27,9 @@ const BottomNav: React.FC = () => {
       path: "/explore",
     },
     {
-      name: "Concierge",
-      icon: ChefHat,
-      path: "/concierge",
+      name: "Smart Room",
+      icon: Home,
+      path: "/smart-room",
     },
     {
       name: "Profile",
