@@ -27,9 +27,9 @@ const BottomNav: React.FC = () => {
       path: "/explore",
     },
     {
-      name: "Smart Room",
-      icon: Home,
-      path: "/smart-room",
+      name: "Concierge",
+      icon: ChefHat,
+      path: "/concierge",
     },
     {
       name: "Profile",
